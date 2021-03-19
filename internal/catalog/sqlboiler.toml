@@ -1,0 +1,12 @@
+output   = "./model"
+pkgname  = "model"
+wipe     = true
+
+[psql]
+dbname = "expense_db"
+host   = "localhost"
+port   = 5432
+user   = "postgres"
+pass   = "password"
+sslmode = "disable"
+blacklist = ["goose_db_version"]
