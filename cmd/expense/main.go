@@ -27,6 +27,6 @@ func main() {
 	r.Get("/GetCategory/{category}", httptransport.GetCategory(svc).ServeHTTP)
 	r.Post("/DelCategory/{category}", httptransport.DelCategory(svc).ServeHTTP)
 
-	log.Println("Listening on :8080 te...")
+	log.Println("Listening on :8080 12...")
 	http.ListenAndServe(":8080", r)
 }
