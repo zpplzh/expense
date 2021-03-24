@@ -11,7 +11,7 @@ import (
 	"github.com/zappel/expense-server/internal/catalog/endpoint"
 )
 
-func GetCategory(Getcat catalog.Service) http.Handler { //interface getcat addcat
+func GetCategory(Getcat catalog.Service) http.HandlerFunc { //interface getcat addcat
 	// Endpoint.
 	return httptransport.NewServer(
 		//endpoint
@@ -26,7 +26,7 @@ func GetCategory(Getcat catalog.Service) http.Handler { //interface getcat addca
 
 		// Encoder.
 		encodeResponse,
-	)
+	).ServeHTTP
 }
 
 func AddCategory(Addcat catalog.Service) http.Handler { //catalog.Service itu function nya tapi dia terima receiver svc yang di main karna di catalog minta receiver

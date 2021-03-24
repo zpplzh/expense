@@ -23,8 +23,8 @@ func main() {
 	svc := catalog.NewServices(db) //func
 
 	r := chi.NewRouter()
-	r.Post("/AddCategory", httptransport.AddCategory(svc).ServeHTTP) //kirim svc itu kirim receiver
-	r.Get("/GetCategory/{category}", httptransport.GetCategory(svc).ServeHTTP)
+	r.Post("/AddCategory", httptransport.AddCategory(svc).ServeHTTP) //kirim svc itu kirim receiver , addcategory(svc) return baru jalanin servehttp
+	r.Get("/GetCategory/{category}", httptransport.GetCategory(svc))
 	r.Post("/DelCategory/{category}", httptransport.DelCategory(svc).ServeHTTP)
 
 	log.Println("Listening on :8080...")
