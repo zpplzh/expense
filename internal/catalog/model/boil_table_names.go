@@ -4,9 +4,11 @@
 package model
 
 var TableNames = struct {
-	Category string
-	Expenses string
+	Category         string
+	Expenses         string
+	SchemaMigrations string
 }{
-	Category: "category",
-	Expenses: "expenses",
+	Category:         "category",
+	Expenses:         "expenses",
+	SchemaMigrations: "schema_migrations",
 }
