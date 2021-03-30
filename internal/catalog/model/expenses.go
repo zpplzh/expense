@@ -19,21 +19,20 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/queries"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 	"github.com/volatiletech/sqlboiler/v4/queries/qmhelper"
-	"github.com/volatiletech/sqlboiler/v4/types"
 	"github.com/volatiletech/strmangle"
 )
 
 // Expense is an object representing the database table.
 type Expense struct {
-	ID          string            `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Name        null.String       `boil:"name" json:"name,omitempty" toml:"name" yaml:"name,omitempty"`
-	Icon        null.String       `boil:"icon" json:"icon,omitempty" toml:"icon" yaml:"icon,omitempty"`
-	Amount      types.NullDecimal `boil:"amount" json:"amount,omitempty" toml:"amount" yaml:"amount,omitempty"`
-	Note        null.String       `boil:"note" json:"note,omitempty" toml:"note" yaml:"note,omitempty"`
-	ExpenseDate null.Time         `boil:"expense_date" json:"expense_date,omitempty" toml:"expense_date" yaml:"expense_date,omitempty"`
-	CreatedAt   null.Time         `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
-	UpdatedAt   null.Time         `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
-	DeletedAt   null.Time         `boil:"deleted_at" json:"deleted_at,omitempty" toml:"deleted_at" yaml:"deleted_at,omitempty"`
+	ID          string      `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Name        string      `boil:"name" json:"name" toml:"name" yaml:"name"`
+	Icon        string      `boil:"icon" json:"icon" toml:"icon" yaml:"icon"`
+	Amount      int         `boil:"amount" json:"amount" toml:"amount" yaml:"amount"`
+	Note        null.String `boil:"note" json:"note,omitempty" toml:"note" yaml:"note,omitempty"`
+	ExpenseDate time.Time   `boil:"expense_date" json:"expense_date" toml:"expense_date" yaml:"expense_date"`
+	CreatedAt   null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
+	UpdatedAt   null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
+	DeletedAt   null.Time   `boil:"deleted_at" json:"deleted_at,omitempty" toml:"deleted_at" yaml:"deleted_at,omitempty"`
 
 	R *expenseR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L expenseL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -63,48 +62,67 @@ var ExpenseColumns = struct {
 
 // Generated where
 
-type whereHelpertypes_NullDecimal struct{ field string }
+type whereHelperint struct{ field string }
 
-func (w whereHelpertypes_NullDecimal) EQ(x types.NullDecimal) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
+func (w whereHelperint) EQ(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelperint) NEQ(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
+func (w whereHelperint) LT(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelperint) LTE(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
+func (w whereHelperint) GT(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelperint) GTE(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
+func (w whereHelperint) IN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
 }
-func (w whereHelpertypes_NullDecimal) NEQ(x types.NullDecimal) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
+func (w whereHelperint) NIN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
 }
-func (w whereHelpertypes_NullDecimal) IsNull() qm.QueryMod { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpertypes_NullDecimal) IsNotNull() qm.QueryMod {
-	return qmhelper.WhereIsNotNull(w.field)
+
+type whereHelpertime_Time struct{ field string }
+
+func (w whereHelpertime_Time) EQ(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.EQ, x)
 }
-func (w whereHelpertypes_NullDecimal) LT(x types.NullDecimal) qm.QueryMod {
+func (w whereHelpertime_Time) NEQ(x time.Time) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.NEQ, x)
+}
+func (w whereHelpertime_Time) LT(x time.Time) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.LT, x)
 }
-func (w whereHelpertypes_NullDecimal) LTE(x types.NullDecimal) qm.QueryMod {
+func (w whereHelpertime_Time) LTE(x time.Time) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.LTE, x)
 }
-func (w whereHelpertypes_NullDecimal) GT(x types.NullDecimal) qm.QueryMod {
+func (w whereHelpertime_Time) GT(x time.Time) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GT, x)
 }
-func (w whereHelpertypes_NullDecimal) GTE(x types.NullDecimal) qm.QueryMod {
+func (w whereHelpertime_Time) GTE(x time.Time) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
 }
 
 var ExpenseWhere = struct {
 	ID          whereHelperstring
-	Name        whereHelpernull_String
-	Icon        whereHelpernull_String
-	Amount      whereHelpertypes_NullDecimal
+	Name        whereHelperstring
+	Icon        whereHelperstring
+	Amount      whereHelperint
 	Note        whereHelpernull_String
-	ExpenseDate whereHelpernull_Time
+	ExpenseDate whereHelpertime_Time
 	CreatedAt   whereHelpernull_Time
 	UpdatedAt   whereHelpernull_Time
 	DeletedAt   whereHelpernull_Time
 }{
 	ID:          whereHelperstring{field: "\"expenses\".\"id\""},
-	Name:        whereHelpernull_String{field: "\"expenses\".\"name\""},
-	Icon:        whereHelpernull_String{field: "\"expenses\".\"icon\""},
-	Amount:      whereHelpertypes_NullDecimal{field: "\"expenses\".\"amount\""},
+	Name:        whereHelperstring{field: "\"expenses\".\"name\""},
+	Icon:        whereHelperstring{field: "\"expenses\".\"icon\""},
+	Amount:      whereHelperint{field: "\"expenses\".\"amount\""},
 	Note:        whereHelpernull_String{field: "\"expenses\".\"note\""},
-	ExpenseDate: whereHelpernull_Time{field: "\"expenses\".\"expense_date\""},
+	ExpenseDate: whereHelpertime_Time{field: "\"expenses\".\"expense_date\""},
 	CreatedAt:   whereHelpernull_Time{field: "\"expenses\".\"created_at\""},
 	UpdatedAt:   whereHelpernull_Time{field: "\"expenses\".\"updated_at\""},
 	DeletedAt:   whereHelpernull_Time{field: "\"expenses\".\"deleted_at\""},

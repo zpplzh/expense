@@ -14,6 +14,7 @@ import "testing"
 func TestParent(t *testing.T) {
 	t.Run("Categories", testCategories)
 	t.Run("Expenses", testExpenses)
+	t.Run("SchemaMigrations", testSchemaMigrations)
 }
 
 func TestSoftDelete(t *testing.T) {
@@ -34,51 +35,61 @@ func TestSliceSoftDeleteAll(t *testing.T) {
 func TestDelete(t *testing.T) {
 	t.Run("Categories", testCategoriesDelete)
 	t.Run("Expenses", testExpensesDelete)
+	t.Run("SchemaMigrations", testSchemaMigrationsDelete)
 }
 
 func TestQueryDeleteAll(t *testing.T) {
 	t.Run("Categories", testCategoriesQueryDeleteAll)
 	t.Run("Expenses", testExpensesQueryDeleteAll)
+	t.Run("SchemaMigrations", testSchemaMigrationsQueryDeleteAll)
 }
 
 func TestSliceDeleteAll(t *testing.T) {
 	t.Run("Categories", testCategoriesSliceDeleteAll)
 	t.Run("Expenses", testExpensesSliceDeleteAll)
+	t.Run("SchemaMigrations", testSchemaMigrationsSliceDeleteAll)
 }
 
 func TestExists(t *testing.T) {
 	t.Run("Categories", testCategoriesExists)
 	t.Run("Expenses", testExpensesExists)
+	t.Run("SchemaMigrations", testSchemaMigrationsExists)
 }
 
 func TestFind(t *testing.T) {
 	t.Run("Categories", testCategoriesFind)
 	t.Run("Expenses", testExpensesFind)
+	t.Run("SchemaMigrations", testSchemaMigrationsFind)
 }
 
 func TestBind(t *testing.T) {
 	t.Run("Categories", testCategoriesBind)
 	t.Run("Expenses", testExpensesBind)
+	t.Run("SchemaMigrations", testSchemaMigrationsBind)
 }
 
 func TestOne(t *testing.T) {
 	t.Run("Categories", testCategoriesOne)
 	t.Run("Expenses", testExpensesOne)
+	t.Run("SchemaMigrations", testSchemaMigrationsOne)
 }
 
 func TestAll(t *testing.T) {
 	t.Run("Categories", testCategoriesAll)
 	t.Run("Expenses", testExpensesAll)
+	t.Run("SchemaMigrations", testSchemaMigrationsAll)
 }
 
 func TestCount(t *testing.T) {
 	t.Run("Categories", testCategoriesCount)
 	t.Run("Expenses", testExpensesCount)
+	t.Run("SchemaMigrations", testSchemaMigrationsCount)
 }
 
 func TestHooks(t *testing.T) {
 	t.Run("Categories", testCategoriesHooks)
 	t.Run("Expenses", testExpensesHooks)
+	t.Run("SchemaMigrations", testSchemaMigrationsHooks)
 }
 
 func TestInsert(t *testing.T) {
@@ -86,6 +97,8 @@ func TestInsert(t *testing.T) {
 	t.Run("Categories", testCategoriesInsertWhitelist)
 	t.Run("Expenses", testExpensesInsert)
 	t.Run("Expenses", testExpensesInsertWhitelist)
+	t.Run("SchemaMigrations", testSchemaMigrationsInsert)
+	t.Run("SchemaMigrations", testSchemaMigrationsInsertWhitelist)
 }
 
 // TestToOne tests cannot be run in parallel
@@ -131,24 +144,29 @@ func TestToManyRemove(t *testing.T) {}
 func TestReload(t *testing.T) {
 	t.Run("Categories", testCategoriesReload)
 	t.Run("Expenses", testExpensesReload)
+	t.Run("SchemaMigrations", testSchemaMigrationsReload)
 }
 
 func TestReloadAll(t *testing.T) {
 	t.Run("Categories", testCategoriesReloadAll)
 	t.Run("Expenses", testExpensesReloadAll)
+	t.Run("SchemaMigrations", testSchemaMigrationsReloadAll)
 }
 
 func TestSelect(t *testing.T) {
 	t.Run("Categories", testCategoriesSelect)
 	t.Run("Expenses", testExpensesSelect)
+	t.Run("SchemaMigrations", testSchemaMigrationsSelect)
 }
 
 func TestUpdate(t *testing.T) {
 	t.Run("Categories", testCategoriesUpdate)
 	t.Run("Expenses", testExpensesUpdate)
+	t.Run("SchemaMigrations", testSchemaMigrationsUpdate)
 }
 
 func TestSliceUpdateAll(t *testing.T) {
 	t.Run("Categories", testCategoriesSliceUpdateAll)
 	t.Run("Expenses", testExpensesSliceUpdateAll)
+	t.Run("SchemaMigrations", testSchemaMigrationsSliceUpdateAll)
 }
