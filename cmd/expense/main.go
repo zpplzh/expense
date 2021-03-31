@@ -40,7 +40,7 @@ func main() {
 
 	r := chi.NewRouter()
 	//path, httphandlerfunc.ServeHTTP
-	r.Post("/addcategory", httptransport.AddCategory(svc).ServeHTTP) //kirim svc itu kirim receiver , addcategory(svc) return baru jalanin servehttp
+	r.Post("/addcategory", httptransport.AddCategory(svc).ServeHTTP) // svc itu kirim receiver , addcategory(svc) return -> servehttp
 	r.Get("/getcategory/{category}", httptransport.GetCategory(svc))
 	r.Post("/deletecategory/{category}", httptransport.DelCategory(svc).ServeHTTP)
 	r.Get("/listcategories", httptransport.ListCategories(svc).ServeHTTP)
