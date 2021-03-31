@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -36,7 +35,6 @@ func main() {
 		log.Print(err)
 	}
 	defer db.Close()
-	fmt.Println("dbname=" + conf.DBName + " user=" + conf.DBName + " password=" + conf.DBPass + " sslmode=disable")
 
 	svc := catalog.NewServices(db) //func
 
