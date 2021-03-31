@@ -23,6 +23,7 @@ func main() {
 	svc := catalog.NewServices(db) //func
 
 	r := chi.NewRouter()
+	//path, httphandlerfunc.ServeHTTP
 	r.Post("/addcategory", httptransport.AddCategory(svc).ServeHTTP) //kirim svc itu kirim receiver , addcategory(svc) return baru jalanin servehttp
 	r.Get("/getcategory/{category}", httptransport.GetCategory(svc))
 	r.Post("/deletecategory/{category}", httptransport.DelCategory(svc).ServeHTTP)
