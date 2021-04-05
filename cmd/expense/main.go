@@ -46,6 +46,7 @@ func main() {
 	r.Get("/listcategories", httptransport.ListCategories(svc).ServeHTTP)
 	r.Post("/addexpense", httptransport.AddExpense(svc).ServeHTTP)
 	r.Get("/listexpenses", httptransport.ListExpenses(svc).ServeHTTP)
+	r.Get("/getexpense/{expense}", httptransport.GetExpense(svc).ServeHTTP)
 
 	log.Println("Listening on ", conf.PortServer, "...")
 	http.ListenAndServe(conf.PortServer, r)

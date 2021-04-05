@@ -126,3 +126,21 @@ func ListExpenses(showallex catalog.Service) http.Handler { //interface getcat a
 		encodeResponse,
 	)
 }
+
+func GetExpense(getex catalog.Service) http.Handler { //interface getcat addcat
+
+	return httptransport.NewServer(
+		//endpoint
+		endpoint.GetExpense(getex),
+
+		// Decoder.
+		func(_ context.Context, r *http.Request) (interface{}, error) {
+			var qry catalog.GetExpenseInput
+			qry.Id = chi.URLParam(r, "expense")
+			return &qry, nil
+		},
+
+		// Encoder.
+		encodeResponse,
+	)
+}

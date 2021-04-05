@@ -33,11 +33,19 @@ type (
 	}
 
 	ListCategoriesInput struct{}
+
+	UpdateCategoryInput struct {
+		Id string `json:"Id"`
+	}
 )
 
 type (
+	GetExpenseInput struct {
+		Id string `json:"Id"`
+	}
+
 	AddExpenseInput struct {
-		Id          string    `json: "id"`
+		Id          string    `json: "Id"`
 		Icon        string    `json:"Icon"`
 		Name        string    `json:"CategoryName"`
 		Amount      int       `json:"Amount"`
@@ -61,16 +69,24 @@ type (
 	DelExpenseInput struct {
 		Id string `json:"id"`
 	}
+
+	UpdateExpenseInput struct {
+		Id string `json:"id"`
+	}
 )
 
 type Service interface {
 	GetCategory(ctx context.Context, input *GetCategoryInput) (*CategoryOutput, error)
 	AddCategory(ctx context.Context, input *AddCategoryInput) (*CategoryOutput, error)
 	DelCategory(ctx context.Context, input *DelCategoryInput) error
+	//UpdateCategory(ctx context.Context, input *UpdateCategoryInput) error
 	ListCategories(ctx context.Context, input *ListCategoriesInput) ([]*CategoryOutput, error)
+
+	GetExpense(ctx context.Context, input *GetExpenseInput) (*ExpenseOutput, error)
 	AddExpense(ctx context.Context, input *AddExpenseInput) (*AddExpenseOutput, error)
 	ListExpense(ctx context.Context, input *ListExpensesInput) ([]*ExpenseOutput, error)
 	DelExpense(ctx context.Context, input *DelExpenseInput) error
+	//UpdateExpense(ctx context.Context, input *UpdateExpenseInput) error
 }
 
 type servicedb struct {
@@ -201,4 +217,21 @@ func (r *servicedb) DelExpense(ctx context.Context, input *DelExpenseInput) erro
 	}
 
 	return nil
+}
+
+func (r *servicedb) GetExpense(ctx context.Context, input *GetExpenseInput) (*ExpenseOutput, error) {
+	getex, err := model.Expenses(qm.Where("Id = ?", input.Id)).One(ctx, r.db)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ExpenseOutput{
+		Id:          getex.ID,
+		Icon:        getex.Icon,
+		Name:        getex.Name,
+		Amount:      getex.Amount,
+		Note:        getex.Note.String,
+		ExpenseData: getex.ExpenseDate,
+	}, nil
+
 }

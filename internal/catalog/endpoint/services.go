@@ -63,3 +63,11 @@ func ListExpenses(showallex catalog.Service) endpoint.Endpoint {
 		return expenses, err
 	}
 }
+
+func GetExpense(getex catalog.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		qry := request.(*catalog.GetExpenseInput)
+		viewex, err := getex.GetExpense(ctx, qry)
+		return viewex, err
+	}
+}
