@@ -13,7 +13,7 @@ import (
 )
 
 func GetCategory(Getcat catalog.Service) http.HandlerFunc { //interface getcat addcat
-	// Endpoint.
+
 	return httptransport.NewServer(
 		//endpoint
 		endpoint.GetCategory(Getcat),
@@ -30,7 +30,8 @@ func GetCategory(Getcat catalog.Service) http.HandlerFunc { //interface getcat a
 	).ServeHTTP
 }
 
-func AddCategory(Addcat catalog.Service) http.Handler { //catalog.Service itu function nya tapi dia terima receiver svc yang di main karna di catalog minta receiver
+func AddCategory(Addcat catalog.Service) http.Handler {
+	//catalog.Service itu function nya tapi dia terima receiver svc yang di main karna di catalog minta receiver
 
 	return httptransport.NewServer(
 		// Endpoint.

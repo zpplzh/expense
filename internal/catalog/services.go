@@ -57,6 +57,10 @@ type (
 	}
 
 	ListExpensesInput struct{}
+
+	DelExpenseInput struct {
+		Id string `json:"id"`
+	}
 )
 
 type Service interface {
@@ -66,6 +70,7 @@ type Service interface {
 	ListCategories(ctx context.Context, input *ListCategoriesInput) ([]*CategoryOutput, error)
 	AddExpense(ctx context.Context, input *AddExpenseInput) (*AddExpenseOutput, error)
 	ListExpense(ctx context.Context, input *ListExpensesInput) ([]*ExpenseOutput, error)
+	DelExpense(ctx context.Context, input *DelExpenseInput) error
 }
 
 type servicedb struct {
@@ -186,4 +191,14 @@ func (r *servicedb) ListExpense(ctx context.Context, input *ListExpensesInput) (
 	}
 
 	return allexarr, nil
+}
+
+func (r *servicedb) DelExpense(ctx context.Context, input *DelExpenseInput) error {
+	// kalau ga pake bintang
+	_, err := model.Expenses(qm.Where("Id = ?", input.Id)).DeleteAll(ctx, r.db, true)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
