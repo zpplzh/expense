@@ -2,10 +2,10 @@ package catalog
 
 import (
 	"context"
-	"math/rand"
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/segmentio/ksuid"
 
 	null "github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
@@ -79,7 +79,6 @@ type (
 
 type (
 	SignUpInput struct {
-		User_id  string `json:"user_id"`
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
@@ -176,15 +175,10 @@ func (r *servicedb) ListCategories(ctx context.Context, input *ListCategoriesInp
 }
 
 func (r *servicedb) AddExpense(ctx context.Context, input *AddExpenseInput) (*AddExpenseOutput, error) {
-	var letter = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-
-	b := make([]rune, 30)
-	for i := range b {
-		b[i] = letter[rand.Intn(len(letter))]
-	}
+	id := ksuid.New()
 
 	inputex := &model.Expense{
-		ID:          string(b),
+		ID:          id.String(),
 		Icon:        input.Icon,
 		Name:        input.Name,
 		Amount:      input.Amount,
@@ -255,8 +249,10 @@ func (r *servicedb) SignUp(ctx context.Context, input *SignUpInput) (*SignUpOutp
 
 	p := h.HashandSalt(input.Password)
 
+	uid := ksuid.New()
+
 	inputus := &model.User{
-		UserID:   input.User_id,
+		UserID:   uid.String(),
 		Email:    input.Email,
 		Password: p,
 	}
