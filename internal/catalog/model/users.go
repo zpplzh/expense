@@ -24,12 +24,12 @@ import (
 
 // User is an object representing the database table.
 type User struct {
-	UserID    string      `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
-	Email     null.String `boil:"email" json:"email,omitempty" toml:"email" yaml:"email,omitempty"`
-	Password  null.String `boil:"password" json:"password,omitempty" toml:"password" yaml:"password,omitempty"`
-	CreatedAt null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
-	UpdatedAt null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
-	DeletedAt null.Time   `boil:"deleted_at" json:"deleted_at,omitempty" toml:"deleted_at" yaml:"deleted_at,omitempty"`
+	UserID    string    `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	Email     string    `boil:"email" json:"email" toml:"email" yaml:"email"`
+	Password  string    `boil:"password" json:"password" toml:"password" yaml:"password"`
+	CreatedAt null.Time `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
+	UpdatedAt null.Time `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
+	DeletedAt null.Time `boil:"deleted_at" json:"deleted_at,omitempty" toml:"deleted_at" yaml:"deleted_at,omitempty"`
 
 	R *userR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L userL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -55,15 +55,15 @@ var UserColumns = struct {
 
 var UserWhere = struct {
 	UserID    whereHelperstring
-	Email     whereHelpernull_String
-	Password  whereHelpernull_String
+	Email     whereHelperstring
+	Password  whereHelperstring
 	CreatedAt whereHelpernull_Time
 	UpdatedAt whereHelpernull_Time
 	DeletedAt whereHelpernull_Time
 }{
 	UserID:    whereHelperstring{field: "\"users\".\"user_id\""},
-	Email:     whereHelpernull_String{field: "\"users\".\"email\""},
-	Password:  whereHelpernull_String{field: "\"users\".\"password\""},
+	Email:     whereHelperstring{field: "\"users\".\"email\""},
+	Password:  whereHelperstring{field: "\"users\".\"password\""},
 	CreatedAt: whereHelpernull_Time{field: "\"users\".\"created_at\""},
 	UpdatedAt: whereHelpernull_Time{field: "\"users\".\"updated_at\""},
 	DeletedAt: whereHelpernull_Time{field: "\"users\".\"deleted_at\""},

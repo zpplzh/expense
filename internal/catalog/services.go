@@ -10,7 +10,9 @@ import (
 	null "github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
+
 	"github.com/zappel/expense-server/internal/catalog/model"
+	"github.com/zappel/expense-server/internal/catalog/pkgs"
 )
 
 type (
@@ -75,6 +77,16 @@ type (
 	}
 )
 
+type (
+	SignUpInput struct {
+		User_id  string `json:"user_id"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	SignUpOutput struct{}
+)
+
 type Service interface {
 	GetCategory(ctx context.Context, input *GetCategoryInput) (*CategoryOutput, error)
 	AddCategory(ctx context.Context, input *AddCategoryInput) (*CategoryOutput, error)
@@ -87,6 +99,8 @@ type Service interface {
 	ListExpense(ctx context.Context, input *ListExpensesInput) ([]*ExpenseOutput, error)
 	DelExpense(ctx context.Context, input *DelExpenseInput) error
 	//UpdateExpense(ctx context.Context, input *UpdateExpenseInput) error
+
+	SignUp(ctx context.Context, input *SignUpInput) (*SignUpOutput, error)
 }
 
 type servicedb struct {
@@ -234,4 +248,23 @@ func (r *servicedb) GetExpense(ctx context.Context, input *GetExpenseInput) (*Ex
 		ExpenseData: getex.ExpenseDate,
 	}, nil
 
+}
+
+func (r *servicedb) SignUp(ctx context.Context, input *SignUpInput) (*SignUpOutput, error) {
+	var h *pkgs.Hash
+
+	p := h.HashandSalt(input.Password)
+
+	inputus := &model.User{
+		UserID:   input.User_id,
+		Email:    input.Email,
+		Password: p,
+	}
+
+	err := inputus.Insert(ctx, r.db, boil.Infer())
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
 }
