@@ -2,15 +2,17 @@ package catalog
 
 import (
 	"context"
-	"math/rand"
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/segmentio/ksuid"
 
 	null "github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
+
 	"github.com/zappel/expense-server/internal/catalog/model"
+	"github.com/zappel/expense-server/internal/catalog/pkgs"
 )
 
 type (
@@ -33,11 +35,19 @@ type (
 	}
 
 	ListCategoriesInput struct{}
+
+	UpdateCategoryInput struct {
+		Id string `json:"Id"`
+	}
 )
 
 type (
+	GetExpenseInput struct {
+		Id string `json:"Id"`
+	}
+
 	AddExpenseInput struct {
-		Id          string    `json: "id"`
+		Id          string    `json: "Id"`
 		Icon        string    `json:"Icon"`
 		Name        string    `json:"CategoryName"`
 		Amount      int       `json:"Amount"`
@@ -61,16 +71,35 @@ type (
 	DelExpenseInput struct {
 		Id string `json:"id"`
 	}
+
+	UpdateExpenseInput struct {
+		Id string `json:"id"`
+	}
+)
+
+type (
+	SignUpInput struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	SignUpOutput struct{}
 )
 
 type Service interface {
 	GetCategory(ctx context.Context, input *GetCategoryInput) (*CategoryOutput, error)
 	AddCategory(ctx context.Context, input *AddCategoryInput) (*CategoryOutput, error)
 	DelCategory(ctx context.Context, input *DelCategoryInput) error
+	//UpdateCategory(ctx context.Context, input *UpdateCategoryInput) error
 	ListCategories(ctx context.Context, input *ListCategoriesInput) ([]*CategoryOutput, error)
+
+	GetExpense(ctx context.Context, input *GetExpenseInput) (*ExpenseOutput, error)
 	AddExpense(ctx context.Context, input *AddExpenseInput) (*AddExpenseOutput, error)
 	ListExpense(ctx context.Context, input *ListExpensesInput) ([]*ExpenseOutput, error)
 	DelExpense(ctx context.Context, input *DelExpenseInput) error
+	//UpdateExpense(ctx context.Context, input *UpdateExpenseInput) error
+
+	SignUp(ctx context.Context, input *SignUpInput) (*SignUpOutput, error)
 }
 
 type servicedb struct {
@@ -146,15 +175,10 @@ func (r *servicedb) ListCategories(ctx context.Context, input *ListCategoriesInp
 }
 
 func (r *servicedb) AddExpense(ctx context.Context, input *AddExpenseInput) (*AddExpenseOutput, error) {
-	var letter = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-
-	b := make([]rune, 30)
-	for i := range b {
-		b[i] = letter[rand.Intn(len(letter))]
-	}
+	id := ksuid.New()
 
 	inputex := &model.Expense{
-		ID:          string(b),
+		ID:          id.String(),
 		Icon:        input.Icon,
 		Name:        input.Name,
 		Amount:      input.Amount,
@@ -201,4 +225,42 @@ func (r *servicedb) DelExpense(ctx context.Context, input *DelExpenseInput) erro
 	}
 
 	return nil
+}
+
+func (r *servicedb) GetExpense(ctx context.Context, input *GetExpenseInput) (*ExpenseOutput, error) {
+	getex, err := model.Expenses(qm.Where("Id = ?", input.Id)).One(ctx, r.db)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ExpenseOutput{
+		Id:          getex.ID,
+		Icon:        getex.Icon,
+		Name:        getex.Name,
+		Amount:      getex.Amount,
+		Note:        getex.Note.String,
+		ExpenseData: getex.ExpenseDate,
+	}, nil
+
+}
+
+func (r *servicedb) SignUp(ctx context.Context, input *SignUpInput) (*SignUpOutput, error) {
+	var h *pkgs.Hash
+
+	p := h.HashandSalt(input.Password)
+
+	uid := ksuid.New()
+
+	inputus := &model.User{
+		UserID:   uid.String(),
+		Email:    input.Email,
+		Password: p,
+	}
+
+	err := inputus.Insert(ctx, r.db, boil.Infer())
+	if err != nil {
+		return nil, err
+	}
+
+	return nil, nil
 }

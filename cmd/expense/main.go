@@ -40,12 +40,19 @@ func main() {
 
 	r := chi.NewRouter()
 	//path, httphandlerfunc.ServeHTTP
+	//category
 	r.Post("/addcategory", httptransport.AddCategory(svc).ServeHTTP) // svc itu kirim receiver , addcategory(svc) return -> servehttp
 	r.Get("/getcategory/{category}", httptransport.GetCategory(svc))
 	r.Post("/deletecategory/{category}", httptransport.DelCategory(svc).ServeHTTP)
 	r.Get("/listcategories", httptransport.ListCategories(svc).ServeHTTP)
+
+	//expenses
 	r.Post("/addexpense", httptransport.AddExpense(svc).ServeHTTP)
 	r.Get("/listexpenses", httptransport.ListExpenses(svc).ServeHTTP)
+	r.Get("/getexpense/{expense}", httptransport.GetExpense(svc).ServeHTTP)
+
+	//user
+	r.Post("/signup", httptransport.SignUp(svc).ServeHTTP)
 
 	log.Println("Listening on ", conf.PortServer, "...")
 	http.ListenAndServe(conf.PortServer, r)

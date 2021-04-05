@@ -2,6 +2,7 @@ package endpoint
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/zappel/expense-server/internal/catalog"
@@ -61,5 +62,24 @@ func ListExpenses(showallex catalog.Service) endpoint.Endpoint {
 		expenses, err := showallex.ListExpense(ctx, input)
 
 		return expenses, err
+	}
+}
+
+func GetExpense(getex catalog.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		qry := request.(*catalog.GetExpenseInput)
+		viewex, err := getex.GetExpense(ctx, qry)
+		fmt.Println(viewex)
+		return viewex, err
+	}
+}
+
+func SignUp(siup catalog.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		input := request.(*catalog.SignUpInput)
+		add, err := siup.SignUp(ctx, input)
+		fmt.Println(input, "rr")
+
+		return add, err
 	}
 }

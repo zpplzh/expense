@@ -3,7 +3,6 @@ package http
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi"
@@ -40,6 +39,7 @@ func AddCategory(Addcat catalog.Service) http.Handler {
 		// Decoder.
 		func(_ context.Context, r *http.Request) (interface{}, error) {
 			var input catalog.AddCategoryInput
+
 			if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 
 			}
@@ -97,7 +97,6 @@ func AddExpense(addex catalog.Service) http.Handler { //interface getcat addcat
 		func(_ context.Context, r *http.Request) (interface{}, error) {
 			var input catalog.AddExpenseInput
 			if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-				fmt.Println(err)
 
 			}
 
@@ -123,6 +122,44 @@ func ListExpenses(showallex catalog.Service) http.Handler { //interface getcat a
 		},
 
 		// Encoder.
+		encodeResponse,
+	)
+}
+
+func GetExpense(getex catalog.Service) http.Handler { //interface getcat addcat
+
+	return httptransport.NewServer(
+		//endpoint
+		endpoint.GetExpense(getex),
+
+		// Decoder.
+		func(_ context.Context, r *http.Request) (interface{}, error) {
+			var qry catalog.GetExpenseInput
+			qry.Id = chi.URLParam(r, "expense")
+			return &qry, nil
+		},
+
+		// Encoder.
+		encodeResponse,
+	)
+}
+
+func SignUp(sgnup catalog.Service) http.Handler {
+	return httptransport.NewServer(
+		//endpoint
+		endpoint.SignUp(sgnup),
+
+		//decoder
+		func(_ context.Context, r *http.Request) (interface{}, error) {
+			var inp catalog.SignUpInput
+
+			if err := json.NewDecoder(r.Body).Decode(&inp); err != nil {
+
+			}
+			return &inp, nil
+		},
+
+		//encoder
 		encodeResponse,
 	)
 }
