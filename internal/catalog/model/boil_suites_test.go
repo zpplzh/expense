@@ -15,81 +15,95 @@ func TestParent(t *testing.T) {
 	t.Run("Categories", testCategories)
 	t.Run("Expenses", testExpenses)
 	t.Run("SchemaMigrations", testSchemaMigrations)
+	t.Run("Users", testUsers)
 }
 
 func TestSoftDelete(t *testing.T) {
 	t.Run("Categories", testCategoriesSoftDelete)
 	t.Run("Expenses", testExpensesSoftDelete)
+	t.Run("Users", testUsersSoftDelete)
 }
 
 func TestQuerySoftDeleteAll(t *testing.T) {
 	t.Run("Categories", testCategoriesQuerySoftDeleteAll)
 	t.Run("Expenses", testExpensesQuerySoftDeleteAll)
+	t.Run("Users", testUsersQuerySoftDeleteAll)
 }
 
 func TestSliceSoftDeleteAll(t *testing.T) {
 	t.Run("Categories", testCategoriesSliceSoftDeleteAll)
 	t.Run("Expenses", testExpensesSliceSoftDeleteAll)
+	t.Run("Users", testUsersSliceSoftDeleteAll)
 }
 
 func TestDelete(t *testing.T) {
 	t.Run("Categories", testCategoriesDelete)
 	t.Run("Expenses", testExpensesDelete)
 	t.Run("SchemaMigrations", testSchemaMigrationsDelete)
+	t.Run("Users", testUsersDelete)
 }
 
 func TestQueryDeleteAll(t *testing.T) {
 	t.Run("Categories", testCategoriesQueryDeleteAll)
 	t.Run("Expenses", testExpensesQueryDeleteAll)
 	t.Run("SchemaMigrations", testSchemaMigrationsQueryDeleteAll)
+	t.Run("Users", testUsersQueryDeleteAll)
 }
 
 func TestSliceDeleteAll(t *testing.T) {
 	t.Run("Categories", testCategoriesSliceDeleteAll)
 	t.Run("Expenses", testExpensesSliceDeleteAll)
 	t.Run("SchemaMigrations", testSchemaMigrationsSliceDeleteAll)
+	t.Run("Users", testUsersSliceDeleteAll)
 }
 
 func TestExists(t *testing.T) {
 	t.Run("Categories", testCategoriesExists)
 	t.Run("Expenses", testExpensesExists)
 	t.Run("SchemaMigrations", testSchemaMigrationsExists)
+	t.Run("Users", testUsersExists)
 }
 
 func TestFind(t *testing.T) {
 	t.Run("Categories", testCategoriesFind)
 	t.Run("Expenses", testExpensesFind)
 	t.Run("SchemaMigrations", testSchemaMigrationsFind)
+	t.Run("Users", testUsersFind)
 }
 
 func TestBind(t *testing.T) {
 	t.Run("Categories", testCategoriesBind)
 	t.Run("Expenses", testExpensesBind)
 	t.Run("SchemaMigrations", testSchemaMigrationsBind)
+	t.Run("Users", testUsersBind)
 }
 
 func TestOne(t *testing.T) {
 	t.Run("Categories", testCategoriesOne)
 	t.Run("Expenses", testExpensesOne)
 	t.Run("SchemaMigrations", testSchemaMigrationsOne)
+	t.Run("Users", testUsersOne)
 }
 
 func TestAll(t *testing.T) {
 	t.Run("Categories", testCategoriesAll)
 	t.Run("Expenses", testExpensesAll)
 	t.Run("SchemaMigrations", testSchemaMigrationsAll)
+	t.Run("Users", testUsersAll)
 }
 
 func TestCount(t *testing.T) {
 	t.Run("Categories", testCategoriesCount)
 	t.Run("Expenses", testExpensesCount)
 	t.Run("SchemaMigrations", testSchemaMigrationsCount)
+	t.Run("Users", testUsersCount)
 }
 
 func TestHooks(t *testing.T) {
 	t.Run("Categories", testCategoriesHooks)
 	t.Run("Expenses", testExpensesHooks)
 	t.Run("SchemaMigrations", testSchemaMigrationsHooks)
+	t.Run("Users", testUsersHooks)
 }
 
 func TestInsert(t *testing.T) {
@@ -99,6 +113,8 @@ func TestInsert(t *testing.T) {
 	t.Run("Expenses", testExpensesInsertWhitelist)
 	t.Run("SchemaMigrations", testSchemaMigrationsInsert)
 	t.Run("SchemaMigrations", testSchemaMigrationsInsertWhitelist)
+	t.Run("Users", testUsersInsert)
+	t.Run("Users", testUsersInsertWhitelist)
 }
 
 // TestToOne tests cannot be run in parallel
@@ -145,28 +161,33 @@ func TestReload(t *testing.T) {
 	t.Run("Categories", testCategoriesReload)
 	t.Run("Expenses", testExpensesReload)
 	t.Run("SchemaMigrations", testSchemaMigrationsReload)
+	t.Run("Users", testUsersReload)
 }
 
 func TestReloadAll(t *testing.T) {
 	t.Run("Categories", testCategoriesReloadAll)
 	t.Run("Expenses", testExpensesReloadAll)
 	t.Run("SchemaMigrations", testSchemaMigrationsReloadAll)
+	t.Run("Users", testUsersReloadAll)
 }
 
 func TestSelect(t *testing.T) {
 	t.Run("Categories", testCategoriesSelect)
 	t.Run("Expenses", testExpensesSelect)
 	t.Run("SchemaMigrations", testSchemaMigrationsSelect)
+	t.Run("Users", testUsersSelect)
 }
 
 func TestUpdate(t *testing.T) {
 	t.Run("Categories", testCategoriesUpdate)
 	t.Run("Expenses", testExpensesUpdate)
 	t.Run("SchemaMigrations", testSchemaMigrationsUpdate)
+	t.Run("Users", testUsersUpdate)
 }
 
 func TestSliceUpdateAll(t *testing.T) {
 	t.Run("Categories", testCategoriesSliceUpdateAll)
 	t.Run("Expenses", testExpensesSliceUpdateAll)
 	t.Run("SchemaMigrations", testSchemaMigrationsSliceUpdateAll)
+	t.Run("Users", testUsersSliceUpdateAll)
 }
