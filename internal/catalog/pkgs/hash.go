@@ -1,7 +1,6 @@
 package pkgs
 
 import (
-	"fmt"
 	"log"
 
 	"golang.org/x/crypto/bcrypt"
@@ -18,7 +17,6 @@ func (h *Hash) HashandSalt(pwd string) string {
 		log.Println(err)
 	}
 	k := string(ha)
-	fmt.Println(k)
 
 	return k
 }
