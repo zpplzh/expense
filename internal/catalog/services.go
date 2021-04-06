@@ -17,7 +17,8 @@ import (
 
 type (
 	GetCategoryInput struct {
-		Name string `json: "CategoryName"`
+		UserID string `json: "Userid"`
+		Name   string `json: "CategoryName"`
 	}
 
 	AddCategoryInput struct {
@@ -47,6 +48,7 @@ type (
 	}
 
 	AddExpenseInput struct {
+		UserID      string    `json: "Userid"`
 		Id          string    `json: "Id"`
 		Icon        string    `json:"Icon"`
 		Name        string    `json:"CategoryName"`
@@ -121,7 +123,7 @@ func (r *servicedb) GetCategory(ctx context.Context, input *GetCategoryInput) (*
 
 	return &CategoryOutput{
 		Name: gcat.Name,
-		Icon: string(gcat.Icon.String),
+		Icon: string(gcat.Icon),
 	}, nil
 
 }
@@ -130,7 +132,7 @@ func (r *servicedb) AddCategory(ctx context.Context, input *AddCategoryInput) (*
 
 	c := &model.Category{
 		Name: input.Name,
-		Icon: null.StringFrom(input.Icon),
+		Icon: input.Icon,
 	}
 
 	err := c.Insert(ctx, r.db, boil.Infer())
@@ -167,7 +169,7 @@ func (r *servicedb) ListCategories(ctx context.Context, input *ListCategoriesInp
 	for _, val := range allcat {
 		allcatarr = append(allcatarr, &CategoryOutput{
 			Name: val.Name,
-			Icon: val.Icon.String,
+			Icon: val.Icon,
 		})
 	}
 
@@ -175,9 +177,11 @@ func (r *servicedb) ListCategories(ctx context.Context, input *ListCategoriesInp
 }
 
 func (r *servicedb) AddExpense(ctx context.Context, input *AddExpenseInput) (*AddExpenseOutput, error) {
+
 	id := ksuid.New()
 
 	inputex := &model.Expense{
+
 		ID:          id.String(),
 		Icon:        input.Icon,
 		Name:        input.Name,
