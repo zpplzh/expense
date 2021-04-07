@@ -7,11 +7,11 @@ Docker : https://dev.to/shree_j/how-to-install-and-run-psql-using-docker-41j2
 2. install golang
 
 3. install project dependencies:
-* Migrate will be use to create table
+* Migrate
 
 `https://github.com/golang-migrate/migrate/blob/master/cmd/migrate/README.md#installation`
 
-* SQLBoiler to execute script to database
+* SQLBoiler
 
 `go get -u -t github.com/volatiletech/sqlboiler/v4
 go get github.com/volatiletech/sqlboiler/v4/drivers/sqlboiler-psql`
