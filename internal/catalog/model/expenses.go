@@ -30,10 +30,11 @@ type Expense struct {
 	Amount      int         `boil:"amount" json:"amount" toml:"amount" yaml:"amount"`
 	Note        null.String `boil:"note" json:"note,omitempty" toml:"note" yaml:"note,omitempty"`
 	ExpenseDate time.Time   `boil:"expense_date" json:"expense_date" toml:"expense_date" yaml:"expense_date"`
+	UserID      string      `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	Sequence    int         `boil:"sequence" json:"sequence" toml:"sequence" yaml:"sequence"`
 	CreatedAt   null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
 	UpdatedAt   null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
 	DeletedAt   null.Time   `boil:"deleted_at" json:"deleted_at,omitempty" toml:"deleted_at" yaml:"deleted_at,omitempty"`
-	Sequence    int         `boil:"sequence" json:"sequence" toml:"sequence" yaml:"sequence"`
 
 	R *expenseR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L expenseL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -46,10 +47,11 @@ var ExpenseColumns = struct {
 	Amount      string
 	Note        string
 	ExpenseDate string
+	UserID      string
+	Sequence    string
 	CreatedAt   string
 	UpdatedAt   string
 	DeletedAt   string
-	Sequence    string
 }{
 	ID:          "id",
 	Name:        "name",
@@ -57,10 +59,11 @@ var ExpenseColumns = struct {
 	Amount:      "amount",
 	Note:        "note",
 	ExpenseDate: "expense_date",
+	UserID:      "user_id",
+	Sequence:    "sequence",
 	CreatedAt:   "created_at",
 	UpdatedAt:   "updated_at",
 	DeletedAt:   "deleted_at",
-	Sequence:    "sequence",
 }
 
 // Generated where
@@ -86,6 +89,29 @@ func (w whereHelperint) NIN(slice []int) qm.QueryMod {
 		values = append(values, value)
 	}
 	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
+}
+
+type whereHelpernull_String struct{ field string }
+
+func (w whereHelpernull_String) EQ(x null.String) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_String) NEQ(x null.String) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_String) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_String) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+func (w whereHelpernull_String) LT(x null.String) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_String) LTE(x null.String) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_String) GT(x null.String) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_String) GTE(x null.String) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
 }
 
 type whereHelpertime_Time struct{ field string }
@@ -116,10 +142,11 @@ var ExpenseWhere = struct {
 	Amount      whereHelperint
 	Note        whereHelpernull_String
 	ExpenseDate whereHelpertime_Time
+	UserID      whereHelperstring
+	Sequence    whereHelperint
 	CreatedAt   whereHelpernull_Time
 	UpdatedAt   whereHelpernull_Time
 	DeletedAt   whereHelpernull_Time
-	Sequence    whereHelperint
 }{
 	ID:          whereHelperstring{field: "\"expenses\".\"id\""},
 	Name:        whereHelperstring{field: "\"expenses\".\"name\""},
@@ -127,10 +154,11 @@ var ExpenseWhere = struct {
 	Amount:      whereHelperint{field: "\"expenses\".\"amount\""},
 	Note:        whereHelpernull_String{field: "\"expenses\".\"note\""},
 	ExpenseDate: whereHelpertime_Time{field: "\"expenses\".\"expense_date\""},
+	UserID:      whereHelperstring{field: "\"expenses\".\"user_id\""},
+	Sequence:    whereHelperint{field: "\"expenses\".\"sequence\""},
 	CreatedAt:   whereHelpernull_Time{field: "\"expenses\".\"created_at\""},
 	UpdatedAt:   whereHelpernull_Time{field: "\"expenses\".\"updated_at\""},
 	DeletedAt:   whereHelpernull_Time{field: "\"expenses\".\"deleted_at\""},
-	Sequence:    whereHelperint{field: "\"expenses\".\"sequence\""},
 }
 
 // ExpenseRels is where relationship names are stored.
@@ -150,8 +178,8 @@ func (*expenseR) NewStruct() *expenseR {
 type expenseL struct{}
 
 var (
-	expenseAllColumns            = []string{"id", "name", "icon", "amount", "note", "expense_date", "created_at", "updated_at", "deleted_at", "sequence"}
-	expenseColumnsWithoutDefault = []string{"id", "name", "icon", "amount", "note", "expense_date", "created_at", "updated_at", "deleted_at"}
+	expenseAllColumns            = []string{"id", "name", "icon", "amount", "note", "expense_date", "user_id", "sequence", "created_at", "updated_at", "deleted_at"}
+	expenseColumnsWithoutDefault = []string{"id", "name", "icon", "amount", "note", "expense_date", "user_id", "created_at", "updated_at", "deleted_at"}
 	expenseColumnsWithDefault    = []string{"sequence"}
 	expensePrimaryKeyColumns     = []string{"id"}
 )
