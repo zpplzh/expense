@@ -86,6 +86,13 @@ type (
 	}
 
 	SignUpOutput struct{}
+
+	LoginInput struct {
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	LoginOutput struct{}
 )
 
 type Service interface {
@@ -102,6 +109,7 @@ type Service interface {
 	//UpdateExpense(ctx context.Context, input *UpdateExpenseInput) error
 
 	SignUp(ctx context.Context, input *SignUpInput) (*SignUpOutput, error)
+	Login(ctx context.Context, input *LoginInput) (*LoginOutput, error)
 }
 
 type servicedb struct {
@@ -265,6 +273,11 @@ func (r *servicedb) SignUp(ctx context.Context, input *SignUpInput) (*SignUpOutp
 	if err != nil {
 		return nil, err
 	}
+
+	return nil, nil
+}
+
+func (r *servicedb) Login(ctx context.Context, input *LoginInput) (*LoginOutput, error) {
 
 	return nil, nil
 }
