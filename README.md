@@ -34,3 +34,16 @@ tables will be created : expenses, users, category
 
 7. then run this command 
 `go run ./cmd/expense`
+
+# Usage
+
+Expense Tracker REST API with several functionality such as:\
+Category
+| API  | Description |
+| ------------- | ------------- |
+| /addcategory  | to add category with icon  |
+| /getcategory | to view category created before  |
+| /deletecategory | to delete category created before  |
+| /listcategory | to view all category created before  |
+
+
