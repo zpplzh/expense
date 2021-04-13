@@ -55,7 +55,7 @@ Expense Tracker REST API with several functionality such as:
 ## Expense
 | API  | Description |
 | ------------- | ------------- |
-| /addexpense  | to add expense with icon  |
+| /addexpense  | to add expense |
 | /getexpense/{expense} | to view expense created before  |
 | /listexpenses | to view all expenses created before  |
 
