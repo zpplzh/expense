@@ -1,7 +1,7 @@
 # Expense Tracker REST API
 
 ## Steps
-1. install postgreSQL on your local/docker (i'm using docker)
+1. install postgreSQL on your local/docker (i'm using docker)\n
 Docker : https://dev.to/shree_j/how-to-install-and-run-psql-using-docker-41j2
 
 2. install golang
