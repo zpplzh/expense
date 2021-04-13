@@ -38,12 +38,28 @@ tables will be created : expenses, users, category
 # Usage
 
 Expense Tracker REST API with several functionality such as:\
-Category
+
+##user
+| API  | Description |
+| ------------- | ------------- |
+| /signup  | to register  |
+
+##Category
 | API  | Description |
 | ------------- | ------------- |
 | /addcategory  | to add category with icon  |
-| /getcategory | to view category created before  |
-| /deletecategory | to delete category created before  |
+| /getcategory/{category} | to view category created before  |
+| /deletecategory/{category} | to delete category created before  |
 | /listcategory | to view all category created before  |
+
+##expense
+| API  | Description |
+| ------------- | ------------- |
+| /addexpense  | to add expense with icon  |
+| /getexpense/{expense} | to view expense created before  |
+| /listexpenses | to view all expenses created before  |
+
+
+
 
 
