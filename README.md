@@ -37,9 +37,9 @@ tables will be created : expenses, users, category
 
 # Usage
 
-Expense Tracker REST API with several functionality such as:\
+Expense Tracker REST API with several functionality such as:
 
-##user
+##User
 | API  | Description |
 | ------------- | ------------- |
 | /signup  | to register  |
