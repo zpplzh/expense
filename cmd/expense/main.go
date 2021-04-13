@@ -39,7 +39,7 @@ func main() {
 	svc := catalog.NewServices(db) //func
 
 	r := chi.NewRouter()
-	//path, httphandlerfunc.ServeHTTP
+
 	//category
 	r.Post("/addcategory", httptransport.AddCategory(svc).ServeHTTP) // svc itu kirim receiver , addcategory(svc) return -> servehttp
 	r.Get("/getcategory/{category}", httptransport.GetCategory(svc))
