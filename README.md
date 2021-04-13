@@ -27,7 +27,7 @@ tables will be created : expenses, users, category
 `(cd ./internal/catalog && sqlboiler --add-soft-deletes psql)`
 
 6. to run application export following environment value\
-`export PORT = :[port] <br/>
+`export PORT = :[port]  
 export DBNAME = "[database name]"
 export DBUSER = "[database user]"
 export DBPASS = "[databse pass]"`
