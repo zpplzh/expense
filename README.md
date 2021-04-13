@@ -1,7 +1,7 @@
 # Expense Tracker REST API
 
 ## Steps
-1. install postgreSQL on your local/docker (i'm using docker)
+1. install postgreSQL on your local/docker (i'm using docker)\
 Docker : https://dev.to/shree_j/how-to-install-and-run-psql-using-docker-41j2
 
 2. install golang
@@ -26,7 +26,7 @@ tables will be created : expenses, users, category
 5. to create models run this command
 `(cd ./internal/catalog && sqlboiler --add-soft-deletes psql)`
 
-6. to run application export following environment value
+6. to run application export following environment value\
 `export PORT = :[port]
 export DBNAME = "[database name]"
 export DBUSER = "[database user]"
