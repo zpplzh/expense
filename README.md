@@ -28,9 +28,9 @@ tables will be created : expenses, users, category
 
 6. to run application export following environment value\
 `export PORT = :[port]`  
-`export DBNAME = "[database name]"`
-`export DBUSER = "[database user]"`
-`export DBPASS = "[databse pass]"`
+`export DBNAME = "[database name]"`  
+`export DBUSER = "[database user]"`  
+`export DBPASS = "[databse pass]"`  
 
 7. then run this command 
 `go run ./cmd/expense`
