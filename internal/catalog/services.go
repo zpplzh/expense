@@ -2,6 +2,7 @@ package catalog
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/jmoiron/sqlx"
@@ -12,7 +13,7 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
 	"github.com/zappel/expense-server/internal/catalog/model"
-	"github.com/zappel/expense-server/internal/catalog/pkgs"
+	pkgs "github.com/zappel/expense-server/pkg"
 )
 
 type (
@@ -112,6 +113,9 @@ type Service interface {
 	Login(ctx context.Context, input *LoginInput) (*LoginOutput, error)
 }
 
+type Validate interface {
+}
+
 type servicedb struct {
 	db *sqlx.DB
 }
@@ -185,6 +189,12 @@ func (r *servicedb) ListCategories(ctx context.Context, input *ListCategoriesInp
 }
 
 func (r *servicedb) AddExpense(ctx context.Context, input *AddExpenseInput) (*AddExpenseOutput, error) {
+	exists, err1 := model.Categories(qm.Where("name=?", input.Name)).Exists(ctx, r.db)
+	if err1 != nil || exists == false {
+		fmt.Println(err1)
+		return nil, err1
+
+	}
 
 	id := ksuid.New()
 
@@ -200,6 +210,7 @@ func (r *servicedb) AddExpense(ctx context.Context, input *AddExpenseInput) (*Ad
 
 	err := inputex.Insert(ctx, r.db, boil.Infer())
 	if err != nil {
+		fmt.Println(err)
 		return nil, err
 	}
 
