@@ -2,6 +2,7 @@ package catalog
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -14,6 +15,12 @@ import (
 
 	"github.com/zappel/expense-server/internal/catalog/model"
 	pkgs "github.com/zappel/expense-server/pkg"
+)
+
+var (
+	ErrNotFound  = errors.New("data not found")
+	ErrDuplicate = errors.New("data duplicate")
+	BadInput     = errors.New("wrong input")
 )
 
 type (
@@ -130,7 +137,7 @@ func (r *servicedb) GetCategory(ctx context.Context, input *GetCategoryInput) (*
 
 	gcat, err := model.Categories(qm.Where("Name = ?", input.Name)).One(ctx, r.db)
 	if err != nil {
-		return nil, err
+		return nil, ErrNotFound
 	}
 
 	return &CategoryOutput{
@@ -141,6 +148,9 @@ func (r *servicedb) GetCategory(ctx context.Context, input *GetCategoryInput) (*
 }
 
 func (r *servicedb) AddCategory(ctx context.Context, input *AddCategoryInput) (*CategoryOutput, error) {
+	if input.Name == "" || input.Icon == "" {
+		return nil, BadInput
+	}
 
 	c := &model.Category{
 		Name: input.Name,
@@ -149,7 +159,8 @@ func (r *servicedb) AddCategory(ctx context.Context, input *AddCategoryInput) (*
 
 	err := c.Insert(ctx, r.db, boil.Infer())
 	if err != nil {
-		return nil, err
+
+		return nil, ErrDuplicate
 	}
 
 	return &CategoryOutput{
@@ -162,7 +173,7 @@ func (r *servicedb) DelCategory(ctx context.Context, input *DelCategoryInput) er
 
 	_, err := model.Categories(qm.Where("Name = ?", input.Name)).DeleteAll(ctx, r.db, true)
 	if err != nil {
-		return err
+		return ErrNotFound
 	}
 
 	return nil
@@ -175,7 +186,7 @@ func (r *servicedb) ListCategories(ctx context.Context, input *ListCategoriesInp
 
 	allcat, err := model.Categories(qm.Select(model.CategoryColumns.Name, model.CategoryColumns.Icon)).All(ctx, r.db)
 	if err != nil {
-		return nil, err
+		return nil, ErrNotFound
 	}
 
 	for _, val := range allcat {

@@ -12,7 +12,10 @@ func GetCategory(getcat catalog.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		qry := request.(*catalog.GetCategoryInput)
 		viewcat, err := getcat.GetCategory(ctx, qry)
-		return viewcat, err
+		if err != nil {
+			return nil, err
+		}
+		return viewcat, nil
 	}
 }
 
@@ -20,8 +23,10 @@ func AddCategory(addcat catalog.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		input := request.(*catalog.AddCategoryInput)
 		add, err := addcat.AddCategory(ctx, input)
-
-		return add, err
+		if err != nil {
+			return nil, err
+		}
+		return add, nil
 	}
 }
 
@@ -30,7 +35,11 @@ func DelCategory(delcat catalog.Service) endpoint.Endpoint {
 		input := request.(*catalog.DelCategoryInput)
 		err := delcat.DelCategory(ctx, input)
 
-		return nil, err
+		if err != nil {
+			return nil, err
+		}
+
+		return input.Name, nil
 	}
 }
 
@@ -40,8 +49,11 @@ func ListCategories(showallcat catalog.Service) endpoint.Endpoint {
 		var categories []*catalog.CategoryOutput
 
 		categories, err := showallcat.ListCategories(ctx, input)
+		if err != nil {
+			return nil, err
+		}
 
-		return categories, err
+		return categories, nil
 	}
 }
 

@@ -1,34 +1,21 @@
 package main
 
 import (
-	"context"
 	"log"
 	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/jmoiron/sqlx"
-	"github.com/sethvargo/go-envconfig"
 
 	_ "github.com/lib/pq"
+	configs "github.com/zappel/expense-server/cmd/expense/config"
 	"github.com/zappel/expense-server/internal/catalog"
 	httptransport "github.com/zappel/expense-server/internal/catalog/http"
 )
 
-type MyConfig struct {
-	PortServer string `env:"PORT"`
-	DBName     string `env:"DBNAME"`
-	DBUsername string `env:"DBUSER"`
-	DBPass     string `env:"DBPASS"`
-}
-
 func main() {
 
-	var conf MyConfig
-	ctx := context.Background()
-
-	if err := envconfig.Process(ctx, &conf); err != nil {
-		log.Fatal(err)
-	}
+	conf := configs.GetEnv()
 
 	db, err := sqlx.Open("postgres", "dbname="+conf.DBName+" user="+conf.DBUsername+" password="+conf.DBPass+" sslmode=disable")
 	if err != nil {

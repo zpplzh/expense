@@ -11,6 +11,11 @@ import (
 	"github.com/zappel/expense-server/internal/catalog/endpoint"
 )
 
+type Resp struct {
+	Message string `json:"message"`
+	Err     string `json:"errormessage"`
+}
+
 func GetCategory(Getcat catalog.Service) http.HandlerFunc { //interface getcat addcat
 
 	return httptransport.NewServer(
@@ -26,6 +31,8 @@ func GetCategory(Getcat catalog.Service) http.HandlerFunc { //interface getcat a
 
 		// Encoder.
 		encodeResponse,
+
+		httptransport.ServerErrorEncoder(encodeError),
 	).ServeHTTP
 }
 
@@ -39,7 +46,6 @@ func AddCategory(Addcat catalog.Service) http.Handler {
 		// Decoder.
 		func(_ context.Context, r *http.Request) (interface{}, error) {
 			var input catalog.AddCategoryInput
-
 			if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 
 			}
@@ -48,6 +54,8 @@ func AddCategory(Addcat catalog.Service) http.Handler {
 
 		// Encoder.
 		encodeResponse,
+
+		httptransport.ServerErrorEncoder(encodeError),
 	)
 }
 
@@ -66,6 +74,8 @@ func DelCategory(Delcat catalog.Service) http.Handler { //interface getcat addca
 
 		// Encoder.
 		encodeResponse,
+
+		httptransport.ServerErrorEncoder(encodeError),
 	)
 }
 
@@ -84,82 +94,7 @@ func ListCategories(showallcat catalog.Service) http.Handler { //interface getca
 
 		// Encoder.
 		encodeResponse,
-	)
-}
 
-func AddExpense(addex catalog.Service) http.Handler { //interface getcat addcat
-	// Endpoint.
-	return httptransport.NewServer(
-		//endpoint
-		endpoint.AddExpense(addex),
-
-		// Decoder.
-		func(_ context.Context, r *http.Request) (interface{}, error) {
-			var input catalog.AddExpenseInput
-			if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-
-			}
-
-			return &input, nil
-		},
-
-		// Encoder.
-		encodeResponse,
-	)
-}
-
-func ListExpenses(showallex catalog.Service) http.Handler { //interface getcat addcat
-	// Endpoint.
-	return httptransport.NewServer(
-		//endpoint
-		endpoint.ListExpenses(showallex),
-
-		// Decoder.
-		func(_ context.Context, r *http.Request) (interface{}, error) {
-			var qry catalog.ListExpensesInput
-
-			return &qry, nil
-		},
-
-		// Encoder.
-		encodeResponse,
-	)
-}
-
-func GetExpense(getex catalog.Service) http.Handler { //interface getcat addcat
-
-	return httptransport.NewServer(
-		//endpoint
-		endpoint.GetExpense(getex),
-
-		// Decoder.
-		func(_ context.Context, r *http.Request) (interface{}, error) {
-			var qry catalog.GetExpenseInput
-			qry.Id = chi.URLParam(r, "expense")
-			return &qry, nil
-		},
-
-		// Encoder.
-		encodeResponse,
-	)
-}
-
-func SignUp(sgnup catalog.Service) http.Handler {
-	return httptransport.NewServer(
-		//endpoint
-		endpoint.SignUp(sgnup),
-
-		//decoder
-		func(_ context.Context, r *http.Request) (interface{}, error) {
-			var inp catalog.SignUpInput
-
-			if err := json.NewDecoder(r.Body).Decode(&inp); err != nil {
-
-			}
-			return &inp, nil
-		},
-
-		//encoder
-		encodeResponse,
+		httptransport.ServerErrorEncoder(encodeError),
 	)
 }
