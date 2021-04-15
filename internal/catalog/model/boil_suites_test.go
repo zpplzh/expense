@@ -15,24 +15,28 @@ func TestParent(t *testing.T) {
 	t.Run("Categories", testCategories)
 	t.Run("Expenses", testExpenses)
 	t.Run("SchemaMigrations", testSchemaMigrations)
+	t.Run("Sessions", testSessions)
 	t.Run("Users", testUsers)
 }
 
 func TestSoftDelete(t *testing.T) {
 	t.Run("Categories", testCategoriesSoftDelete)
 	t.Run("Expenses", testExpensesSoftDelete)
+	t.Run("Sessions", testSessionsSoftDelete)
 	t.Run("Users", testUsersSoftDelete)
 }
 
 func TestQuerySoftDeleteAll(t *testing.T) {
 	t.Run("Categories", testCategoriesQuerySoftDeleteAll)
 	t.Run("Expenses", testExpensesQuerySoftDeleteAll)
+	t.Run("Sessions", testSessionsQuerySoftDeleteAll)
 	t.Run("Users", testUsersQuerySoftDeleteAll)
 }
 
 func TestSliceSoftDeleteAll(t *testing.T) {
 	t.Run("Categories", testCategoriesSliceSoftDeleteAll)
 	t.Run("Expenses", testExpensesSliceSoftDeleteAll)
+	t.Run("Sessions", testSessionsSliceSoftDeleteAll)
 	t.Run("Users", testUsersSliceSoftDeleteAll)
 }
 
@@ -40,6 +44,7 @@ func TestDelete(t *testing.T) {
 	t.Run("Categories", testCategoriesDelete)
 	t.Run("Expenses", testExpensesDelete)
 	t.Run("SchemaMigrations", testSchemaMigrationsDelete)
+	t.Run("Sessions", testSessionsDelete)
 	t.Run("Users", testUsersDelete)
 }
 
@@ -47,6 +52,7 @@ func TestQueryDeleteAll(t *testing.T) {
 	t.Run("Categories", testCategoriesQueryDeleteAll)
 	t.Run("Expenses", testExpensesQueryDeleteAll)
 	t.Run("SchemaMigrations", testSchemaMigrationsQueryDeleteAll)
+	t.Run("Sessions", testSessionsQueryDeleteAll)
 	t.Run("Users", testUsersQueryDeleteAll)
 }
 
@@ -54,6 +60,7 @@ func TestSliceDeleteAll(t *testing.T) {
 	t.Run("Categories", testCategoriesSliceDeleteAll)
 	t.Run("Expenses", testExpensesSliceDeleteAll)
 	t.Run("SchemaMigrations", testSchemaMigrationsSliceDeleteAll)
+	t.Run("Sessions", testSessionsSliceDeleteAll)
 	t.Run("Users", testUsersSliceDeleteAll)
 }
 
@@ -61,6 +68,7 @@ func TestExists(t *testing.T) {
 	t.Run("Categories", testCategoriesExists)
 	t.Run("Expenses", testExpensesExists)
 	t.Run("SchemaMigrations", testSchemaMigrationsExists)
+	t.Run("Sessions", testSessionsExists)
 	t.Run("Users", testUsersExists)
 }
 
@@ -68,6 +76,7 @@ func TestFind(t *testing.T) {
 	t.Run("Categories", testCategoriesFind)
 	t.Run("Expenses", testExpensesFind)
 	t.Run("SchemaMigrations", testSchemaMigrationsFind)
+	t.Run("Sessions", testSessionsFind)
 	t.Run("Users", testUsersFind)
 }
 
@@ -75,6 +84,7 @@ func TestBind(t *testing.T) {
 	t.Run("Categories", testCategoriesBind)
 	t.Run("Expenses", testExpensesBind)
 	t.Run("SchemaMigrations", testSchemaMigrationsBind)
+	t.Run("Sessions", testSessionsBind)
 	t.Run("Users", testUsersBind)
 }
 
@@ -82,6 +92,7 @@ func TestOne(t *testing.T) {
 	t.Run("Categories", testCategoriesOne)
 	t.Run("Expenses", testExpensesOne)
 	t.Run("SchemaMigrations", testSchemaMigrationsOne)
+	t.Run("Sessions", testSessionsOne)
 	t.Run("Users", testUsersOne)
 }
 
@@ -89,6 +100,7 @@ func TestAll(t *testing.T) {
 	t.Run("Categories", testCategoriesAll)
 	t.Run("Expenses", testExpensesAll)
 	t.Run("SchemaMigrations", testSchemaMigrationsAll)
+	t.Run("Sessions", testSessionsAll)
 	t.Run("Users", testUsersAll)
 }
 
@@ -96,6 +108,7 @@ func TestCount(t *testing.T) {
 	t.Run("Categories", testCategoriesCount)
 	t.Run("Expenses", testExpensesCount)
 	t.Run("SchemaMigrations", testSchemaMigrationsCount)
+	t.Run("Sessions", testSessionsCount)
 	t.Run("Users", testUsersCount)
 }
 
@@ -103,6 +116,7 @@ func TestHooks(t *testing.T) {
 	t.Run("Categories", testCategoriesHooks)
 	t.Run("Expenses", testExpensesHooks)
 	t.Run("SchemaMigrations", testSchemaMigrationsHooks)
+	t.Run("Sessions", testSessionsHooks)
 	t.Run("Users", testUsersHooks)
 }
 
@@ -113,6 +127,8 @@ func TestInsert(t *testing.T) {
 	t.Run("Expenses", testExpensesInsertWhitelist)
 	t.Run("SchemaMigrations", testSchemaMigrationsInsert)
 	t.Run("SchemaMigrations", testSchemaMigrationsInsertWhitelist)
+	t.Run("Sessions", testSessionsInsert)
+	t.Run("Sessions", testSessionsInsertWhitelist)
 	t.Run("Users", testUsersInsert)
 	t.Run("Users", testUsersInsertWhitelist)
 }
@@ -161,6 +177,7 @@ func TestReload(t *testing.T) {
 	t.Run("Categories", testCategoriesReload)
 	t.Run("Expenses", testExpensesReload)
 	t.Run("SchemaMigrations", testSchemaMigrationsReload)
+	t.Run("Sessions", testSessionsReload)
 	t.Run("Users", testUsersReload)
 }
 
@@ -168,6 +185,7 @@ func TestReloadAll(t *testing.T) {
 	t.Run("Categories", testCategoriesReloadAll)
 	t.Run("Expenses", testExpensesReloadAll)
 	t.Run("SchemaMigrations", testSchemaMigrationsReloadAll)
+	t.Run("Sessions", testSessionsReloadAll)
 	t.Run("Users", testUsersReloadAll)
 }
 
@@ -175,6 +193,7 @@ func TestSelect(t *testing.T) {
 	t.Run("Categories", testCategoriesSelect)
 	t.Run("Expenses", testExpensesSelect)
 	t.Run("SchemaMigrations", testSchemaMigrationsSelect)
+	t.Run("Sessions", testSessionsSelect)
 	t.Run("Users", testUsersSelect)
 }
 
@@ -182,6 +201,7 @@ func TestUpdate(t *testing.T) {
 	t.Run("Categories", testCategoriesUpdate)
 	t.Run("Expenses", testExpensesUpdate)
 	t.Run("SchemaMigrations", testSchemaMigrationsUpdate)
+	t.Run("Sessions", testSessionsUpdate)
 	t.Run("Users", testUsersUpdate)
 }
 
@@ -189,5 +209,6 @@ func TestSliceUpdateAll(t *testing.T) {
 	t.Run("Categories", testCategoriesSliceUpdateAll)
 	t.Run("Expenses", testExpensesSliceUpdateAll)
 	t.Run("SchemaMigrations", testSchemaMigrationsSliceUpdateAll)
+	t.Run("Sessions", testSessionsSliceUpdateAll)
 	t.Run("Users", testUsersSliceUpdateAll)
 }

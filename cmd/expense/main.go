@@ -40,6 +40,7 @@ func main() {
 
 	//user
 	r.Post("/signup", httptransport.SignUp(svc).ServeHTTP)
+	r.Post("/login", httptransport.Login(svc).ServeHTTP)
 
 	log.Println("Listening on ", conf.PortServer, "...")
 	http.ListenAndServe(conf.PortServer, r)

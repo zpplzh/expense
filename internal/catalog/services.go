@@ -14,13 +14,14 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
 	"github.com/zappel/expense-server/internal/catalog/model"
-	pkgs "github.com/zappel/expense-server/pkg"
+	pkgs "github.com/zappel/expense-server/internal/pkg"
 )
 
 var (
 	ErrNotFound  = errors.New("data not found")
 	ErrDuplicate = errors.New("data duplicate")
 	BadInput     = errors.New("wrong input")
+	ErrAuth      = errors.New("User not exist")
 )
 
 type (
@@ -100,7 +101,9 @@ type (
 		Password string `json:"password"`
 	}
 
-	LoginOutput struct{}
+	LoginOutput struct {
+		Sessionid string `json:"sessionid"`
+	}
 )
 
 type Service interface {
@@ -202,8 +205,8 @@ func (r *servicedb) ListCategories(ctx context.Context, input *ListCategoriesInp
 func (r *servicedb) AddExpense(ctx context.Context, input *AddExpenseInput) (*AddExpenseOutput, error) {
 	exists, err1 := model.Categories(qm.Where("name=?", input.Name)).Exists(ctx, r.db)
 	if err1 != nil || exists == false {
-		fmt.Println(err1)
-		return nil, err1
+
+		return nil, ErrNotFound
 
 	}
 
@@ -221,8 +224,8 @@ func (r *servicedb) AddExpense(ctx context.Context, input *AddExpenseInput) (*Ad
 
 	err := inputex.Insert(ctx, r.db, boil.Infer())
 	if err != nil {
-		fmt.Println(err)
-		return nil, err
+
+		return nil, ErrDuplicate
 	}
 
 	return nil, nil
@@ -234,7 +237,7 @@ func (r *servicedb) ListExpense(ctx context.Context, input *ListExpensesInput) (
 
 	allcat, err := model.Expenses(qm.Select("*")).All(ctx, r.db)
 	if err != nil {
-		return nil, err
+		return nil, ErrNotFound
 	}
 
 	for _, val := range allcat {
@@ -255,7 +258,7 @@ func (r *servicedb) DelExpense(ctx context.Context, input *DelExpenseInput) erro
 	// kalau ga pake bintang
 	_, err := model.Expenses(qm.Where("Id = ?", input.Id)).DeleteAll(ctx, r.db, true)
 	if err != nil {
-		return err
+		return ErrNotFound
 	}
 
 	return nil
@@ -264,7 +267,7 @@ func (r *servicedb) DelExpense(ctx context.Context, input *DelExpenseInput) erro
 func (r *servicedb) GetExpense(ctx context.Context, input *GetExpenseInput) (*ExpenseOutput, error) {
 	getex, err := model.Expenses(qm.Where("Id = ?", input.Id)).One(ctx, r.db)
 	if err != nil {
-		return nil, err
+		return nil, ErrNotFound
 	}
 
 	return &ExpenseOutput{
@@ -293,13 +296,54 @@ func (r *servicedb) SignUp(ctx context.Context, input *SignUpInput) (*SignUpOutp
 
 	err := inputus.Insert(ctx, r.db, boil.Infer())
 	if err != nil {
-		return nil, err
+		return nil, ErrDuplicate
 	}
 
 	return nil, nil
 }
 
 func (r *servicedb) Login(ctx context.Context, input *LoginInput) (*LoginOutput, error) {
+	var h *pkgs.Hash
 
-	return nil, nil
+	gus, err := model.Users(qm.Where("Email = ?", input.Email)).One(ctx, r.db)
+	if err != nil {
+		return nil, ErrNotFound
+	}
+	match := h.CheckPass(input.Password, gus.Password)
+	if !match {
+		return nil, ErrAuth
+
+	}
+	fin := ""
+
+	for {
+		tampsess := pkgs.RandSessionid()
+		exists, err1 := model.Sessions(qm.Where("sessionid=?", tampsess)).Exists(ctx, r.db)
+		if err1 != nil || exists == false {
+			fmt.Println(err1)
+			continue
+
+		}
+		if err == nil {
+			fin = tampsess
+			fmt.Println(tampsess)
+			break
+		}
+
+	}
+
+	inpt := &model.Session{
+		Sessionid: fin,
+		UserID:    gus.UserID,
+		Expiry:    time.Now().Add(time.Minute * 15),
+	}
+
+	errd := inpt.Insert(ctx, r.db, boil.Infer())
+	if errd != nil {
+		return nil, ErrDuplicate
+	}
+
+	return &LoginOutput{
+		Sessionid: fin,
+	}, nil
 }

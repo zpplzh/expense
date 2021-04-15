@@ -20,3 +20,13 @@ func (h *Hash) HashandSalt(pwd string) string {
 
 	return k
 }
+
+func (h *Hash) CheckPass(pwd string, hash string) bool {
+
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(pwd))
+	if err != nil {
+		log.Println(err)
+	}
+
+	return err == nil
+}

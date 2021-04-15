@@ -95,3 +95,12 @@ func SignUp(siup catalog.Service) endpoint.Endpoint {
 		return add, err
 	}
 }
+
+func Login(logi catalog.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		input := request.(*catalog.LoginInput)
+		ex, err := logi.Login(ctx, input)
+
+		return ex, err
+	}
+}
