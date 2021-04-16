@@ -52,25 +52,30 @@ type (
 )
 
 func (r *servicedb) AddExpense(ctx context.Context, input *AddExpenseInput) (*AddExpenseOutput, error) {
+
+	if input.Icon == "" || input.Name == "" || checkInput(input.Name) == false {
+		return nil, BadInput
+	}
+
 	uid := ctx.Value("sessionid")
 
-	gusid, err1 := model.Sessions(qm.Where("sessionid = ?", uid)).One(ctx, r.db)
+	outp, err1 := r.GetID(ctx, uid)
 	if err1 != nil {
 		return nil, ErrNotFound
 	}
 
-	ex, err2 := model.Categories(qm.Where("name=? and user_id=?", input.Name, gusid.UserID)).One(ctx, r.db)
+	ex, err2 := model.Categories(qm.Where("name=? and user_id=?", input.Name, outp.sesid)).One(ctx, r.db)
 	if err2 != nil {
 		return nil, ErrNotFound
 	}
 
 	fmt.Println(ex.Icon, ex.UserID)
 
-	if ex.Icon == input.Icon && ex.Name == input.Name && gusid.UserID == ex.UserID {
+	if ex.Icon == input.Icon && ex.Name == input.Name && outp.sesid == ex.UserID {
 		id := ksuid.New()
 
 		inputex := &model.Expense{
-			UserID:      gusid.UserID,
+			UserID:      outp.sesid,
 			ID:          id.String(),
 			Icon:        input.Icon,
 			Name:        input.Name,

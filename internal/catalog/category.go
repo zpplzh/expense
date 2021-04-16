@@ -39,12 +39,12 @@ type (
 
 func (r *servicedb) GetCategory(ctx context.Context, input *GetCategoryInput) (*CategoryOutput, error) {
 	sid := ctx.Value("sessionid")
-	gusid, err1 := model.Sessions(qm.Where("sessionid = ?", sid)).One(ctx, r.db)
+	outp, err1 := r.GetID(ctx, sid)
 	if err1 != nil {
 		return nil, ErrNotFound
 	}
 
-	gcat, err := model.Categories(qm.Where("Name = ? and user_id =?", input.Name, gusid.UserID)).One(ctx, r.db)
+	gcat, err := model.Categories(qm.Where("Name = ? and user_id =?", input.Name, outp.sesid)).One(ctx, r.db)
 	if err != nil {
 		return nil, ErrNotFound
 	}
@@ -57,7 +57,7 @@ func (r *servicedb) GetCategory(ctx context.Context, input *GetCategoryInput) (*
 }
 
 func (r *servicedb) AddCategory(ctx context.Context, input *AddCategoryInput) (*CategoryOutput, error) {
-	if input.Name == "" || input.Icon == "" {
+	if input.Name == "" || input.Icon == "" || checkInput(input.Name) == false {
 		return nil, BadInput
 	}
 
@@ -68,7 +68,13 @@ func (r *servicedb) AddCategory(ctx context.Context, input *AddCategoryInput) (*
 		return nil, ErrNotFound
 	}
 
+	exists, err1 := model.Categories(qm.Where("user_id=? AND icon =? AND name=?", gusid.UserID, input.Icon, input.Name)).Exists(ctx, r.db)
+	if err1 != nil || exists == true {
+		return nil, DataExistErr
+	}
+
 	c := &model.Category{
+
 		UserID: gusid.UserID,
 		Name:   input.Name,
 		Icon:   input.Icon,
@@ -114,4 +120,10 @@ func (r *servicedb) ListCategories(ctx context.Context, input *ListCategoriesInp
 	}
 
 	return allcatarr, nil
+}
+
+func (r *servicedb) UpdateCategory(ctx context.Context, input *UpdateCategoryInput) error {
+
+	return nil
+
 }

@@ -250,7 +250,7 @@ func testCategoriesExists(t *testing.T) {
 		t.Error(err)
 	}
 
-	e, err := CategoryExists(ctx, tx, o.Name)
+	e, err := CategoryExists(ctx, tx, o.Categoryid)
 	if err != nil {
 		t.Errorf("Unable to check if Category exists: %s", err)
 	}
@@ -276,7 +276,7 @@ func testCategoriesFind(t *testing.T) {
 		t.Error(err)
 	}
 
-	categoryFound, err := FindCategory(ctx, tx, o.Name)
+	categoryFound, err := FindCategory(ctx, tx, o.Categoryid)
 	if err != nil {
 		t.Error(err)
 	}
@@ -669,7 +669,7 @@ func testCategoriesSelect(t *testing.T) {
 }
 
 var (
-	categoryDBTypes = map[string]string{`Name`: `text`, `Icon`: `text`, `UserID`: `text`, `CreatedAt`: `timestamp with time zone`, `UpdatedAt`: `timestamp with time zone`, `DeletedAt`: `timestamp with time zone`}
+	categoryDBTypes = map[string]string{`Categoryid`: `integer`, `Name`: `text`, `Icon`: `text`, `UserID`: `text`, `CreatedAt`: `timestamp with time zone`, `UpdatedAt`: `timestamp with time zone`, `DeletedAt`: `timestamp with time zone`}
 	_               = bytes.MinRead
 )
 

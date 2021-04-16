@@ -15,7 +15,7 @@ var (
 )
 
 type Aut interface {
-	Validateus(next http.Handler) http.Handler
+	ValidateUser(next http.Handler) http.Handler
 }
 
 type servicedb2 struct {
@@ -28,7 +28,7 @@ func NewServicess(db *sqlx.DB) Aut {
 	}
 }
 
-func (r *servicedb2) Validateus(next http.Handler) http.Handler {
+func (r *servicedb2) ValidateUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		ro := req.Header.Get("sessionid")
 		ctxz := context.Background()

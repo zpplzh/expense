@@ -24,34 +24,60 @@ import (
 
 // Category is an object representing the database table.
 type Category struct {
-	Name      string    `boil:"name" json:"name" toml:"name" yaml:"name"`
-	Icon      string    `boil:"icon" json:"icon" toml:"icon" yaml:"icon"`
-	UserID    string    `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
-	CreatedAt null.Time `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
-	UpdatedAt null.Time `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
-	DeletedAt null.Time `boil:"deleted_at" json:"deleted_at,omitempty" toml:"deleted_at" yaml:"deleted_at,omitempty"`
+	Categoryid int       `boil:"categoryid" json:"categoryid" toml:"categoryid" yaml:"categoryid"`
+	Name       string    `boil:"name" json:"name" toml:"name" yaml:"name"`
+	Icon       string    `boil:"icon" json:"icon" toml:"icon" yaml:"icon"`
+	UserID     string    `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	CreatedAt  null.Time `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
+	UpdatedAt  null.Time `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
+	DeletedAt  null.Time `boil:"deleted_at" json:"deleted_at,omitempty" toml:"deleted_at" yaml:"deleted_at,omitempty"`
 
 	R *categoryR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L categoryL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var CategoryColumns = struct {
-	Name      string
-	Icon      string
-	UserID    string
-	CreatedAt string
-	UpdatedAt string
-	DeletedAt string
+	Categoryid string
+	Name       string
+	Icon       string
+	UserID     string
+	CreatedAt  string
+	UpdatedAt  string
+	DeletedAt  string
 }{
-	Name:      "name",
-	Icon:      "icon",
-	UserID:    "user_id",
-	CreatedAt: "created_at",
-	UpdatedAt: "updated_at",
-	DeletedAt: "deleted_at",
+	Categoryid: "categoryid",
+	Name:       "name",
+	Icon:       "icon",
+	UserID:     "user_id",
+	CreatedAt:  "created_at",
+	UpdatedAt:  "updated_at",
+	DeletedAt:  "deleted_at",
 }
 
 // Generated where
+
+type whereHelperint struct{ field string }
+
+func (w whereHelperint) EQ(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelperint) NEQ(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
+func (w whereHelperint) LT(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelperint) LTE(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
+func (w whereHelperint) GT(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelperint) GTE(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
+func (w whereHelperint) IN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
+}
+func (w whereHelperint) NIN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
+}
 
 type whereHelperstring struct{ field string }
 
@@ -100,19 +126,21 @@ func (w whereHelpernull_Time) GTE(x null.Time) qm.QueryMod {
 }
 
 var CategoryWhere = struct {
-	Name      whereHelperstring
-	Icon      whereHelperstring
-	UserID    whereHelperstring
-	CreatedAt whereHelpernull_Time
-	UpdatedAt whereHelpernull_Time
-	DeletedAt whereHelpernull_Time
+	Categoryid whereHelperint
+	Name       whereHelperstring
+	Icon       whereHelperstring
+	UserID     whereHelperstring
+	CreatedAt  whereHelpernull_Time
+	UpdatedAt  whereHelpernull_Time
+	DeletedAt  whereHelpernull_Time
 }{
-	Name:      whereHelperstring{field: "\"category\".\"name\""},
-	Icon:      whereHelperstring{field: "\"category\".\"icon\""},
-	UserID:    whereHelperstring{field: "\"category\".\"user_id\""},
-	CreatedAt: whereHelpernull_Time{field: "\"category\".\"created_at\""},
-	UpdatedAt: whereHelpernull_Time{field: "\"category\".\"updated_at\""},
-	DeletedAt: whereHelpernull_Time{field: "\"category\".\"deleted_at\""},
+	Categoryid: whereHelperint{field: "\"category\".\"categoryid\""},
+	Name:       whereHelperstring{field: "\"category\".\"name\""},
+	Icon:       whereHelperstring{field: "\"category\".\"icon\""},
+	UserID:     whereHelperstring{field: "\"category\".\"user_id\""},
+	CreatedAt:  whereHelpernull_Time{field: "\"category\".\"created_at\""},
+	UpdatedAt:  whereHelpernull_Time{field: "\"category\".\"updated_at\""},
+	DeletedAt:  whereHelpernull_Time{field: "\"category\".\"deleted_at\""},
 }
 
 // CategoryRels is where relationship names are stored.
@@ -132,10 +160,10 @@ func (*categoryR) NewStruct() *categoryR {
 type categoryL struct{}
 
 var (
-	categoryAllColumns            = []string{"name", "icon", "user_id", "created_at", "updated_at", "deleted_at"}
+	categoryAllColumns            = []string{"categoryid", "name", "icon", "user_id", "created_at", "updated_at", "deleted_at"}
 	categoryColumnsWithoutDefault = []string{"name", "icon", "user_id", "created_at", "updated_at", "deleted_at"}
-	categoryColumnsWithDefault    = []string{}
-	categoryPrimaryKeyColumns     = []string{"name"}
+	categoryColumnsWithDefault    = []string{"categoryid"}
+	categoryPrimaryKeyColumns     = []string{"categoryid"}
 )
 
 type (
@@ -421,7 +449,7 @@ func Categories(mods ...qm.QueryMod) categoryQuery {
 
 // FindCategory retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindCategory(ctx context.Context, exec boil.ContextExecutor, name string, selectCols ...string) (*Category, error) {
+func FindCategory(ctx context.Context, exec boil.ContextExecutor, categoryid int, selectCols ...string) (*Category, error) {
 	categoryObj := &Category{}
 
 	sel := "*"
@@ -429,10 +457,10 @@ func FindCategory(ctx context.Context, exec boil.ContextExecutor, name string, s
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from \"category\" where \"name\"=$1 and \"deleted_at\" is null", sel,
+		"select %s from \"category\" where \"categoryid\"=$1 and \"deleted_at\" is null", sel,
 	)
 
-	q := queries.Raw(query, name)
+	q := queries.Raw(query, categoryid)
 
 	err := q.Bind(ctx, exec, categoryObj)
 	if err != nil {
@@ -808,12 +836,12 @@ func (o *Category) Delete(ctx context.Context, exec boil.ContextExecutor, hardDe
 	)
 	if hardDelete {
 		args = queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), categoryPrimaryKeyMapping)
-		sql = "DELETE FROM \"category\" WHERE \"name\"=$1"
+		sql = "DELETE FROM \"category\" WHERE \"categoryid\"=$1"
 	} else {
 		currTime := time.Now().In(boil.GetLocation())
 		o.DeletedAt = null.TimeFrom(currTime)
 		wl := []string{"deleted_at"}
-		sql = fmt.Sprintf("UPDATE \"category\" SET %s WHERE \"name\"=$2",
+		sql = fmt.Sprintf("UPDATE \"category\" SET %s WHERE \"categoryid\"=$2",
 			strmangle.SetParamNames("\"", "\"", 1, wl),
 		)
 		valueMapping, err := queries.BindMapping(categoryType, categoryMapping, append(wl, categoryPrimaryKeyColumns...))
@@ -940,7 +968,7 @@ func (o CategorySlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor,
 // Reload refetches the object from the database
 // using the primary keys with an executor.
 func (o *Category) Reload(ctx context.Context, exec boil.ContextExecutor) error {
-	ret, err := FindCategory(ctx, exec, o.Name)
+	ret, err := FindCategory(ctx, exec, o.Categoryid)
 	if err != nil {
 		return err
 	}
@@ -980,16 +1008,16 @@ func (o *CategorySlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor
 }
 
 // CategoryExists checks if the Category row exists.
-func CategoryExists(ctx context.Context, exec boil.ContextExecutor, name string) (bool, error) {
+func CategoryExists(ctx context.Context, exec boil.ContextExecutor, categoryid int) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from \"category\" where \"name\"=$1 and \"deleted_at\" is null limit 1)"
+	sql := "select exists(select 1 from \"category\" where \"categoryid\"=$1 and \"deleted_at\" is null limit 1)"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
 		fmt.Fprintln(writer, sql)
-		fmt.Fprintln(writer, name)
+		fmt.Fprintln(writer, categoryid)
 	}
-	row := exec.QueryRowContext(ctx, sql, name)
+	row := exec.QueryRowContext(ctx, sql, categoryid)
 
 	err := row.Scan(&exists)
 	if err != nil {

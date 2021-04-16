@@ -60,3 +60,9 @@ func checkEmail(email string) bool {
 	fmt.Println(emailRegex)
 	return true //emailRegex.MatchString(email)
 }
+
+func checkInput(in string) bool {
+	var inpstr = regexp.MustCompile("[a-zA-Z0-9]")
+
+	return inpstr.MatchString(in)
+}

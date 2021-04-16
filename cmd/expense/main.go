@@ -39,7 +39,7 @@ func main() {
 	r.Use(secureMiddleware.Handler)
 
 	r.Group(func(c chi.Router) {
-		c.Use(svcm.Validateus)
+		c.Use(svcm.ValidateUser)
 
 		//category
 		c.Post("/addcategory", httptransport.AddCategory(svc).ServeHTTP) // svc itu kirim receiver , addcategory(svc) return -> servehttp
