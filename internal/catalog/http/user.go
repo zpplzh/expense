@@ -51,3 +51,24 @@ func Login(logi catalog.Service) http.Handler {
 		httptransport.ServerErrorEncoder(encodeError),
 	)
 }
+
+func Logout(logo catalog.Service) http.Handler {
+	return httptransport.NewServer(
+		//endpoint
+		endpoint.Logout(logo),
+
+		//decoder
+		func(_ context.Context, r *http.Request) (interface{}, error) {
+			var inp catalog.Logoutinput
+
+			if err := json.NewDecoder(r.Body).Decode(&inp); err != nil {
+
+			}
+			return &inp, nil
+		},
+
+		//encoder
+		encodeResponse,
+		httptransport.ServerErrorEncoder(encodeError),
+	)
+}

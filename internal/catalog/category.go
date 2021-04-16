@@ -16,8 +16,9 @@ type (
 	}
 
 	AddCategoryInput struct {
-		Icon string `json:"Icon"`
-		Name string `json:"categoryName"`
+		Userid string `json: "userid"`
+		Icon   string `json:"Icon"`
+		Name   string `json:"categoryName"`
 	}
 
 	CategoryOutput struct {
@@ -37,8 +38,13 @@ type (
 )
 
 func (r *servicedb) GetCategory(ctx context.Context, input *GetCategoryInput) (*CategoryOutput, error) {
+	sid := ctx.Value("sessionid")
+	gusid, err1 := model.Sessions(qm.Where("sessionid = ?", sid)).One(ctx, r.db)
+	if err1 != nil {
+		return nil, ErrNotFound
+	}
 
-	gcat, err := model.Categories(qm.Where("Name = ?", input.Name)).One(ctx, r.db)
+	gcat, err := model.Categories(qm.Where("Name = ? and user_id =?", input.Name, gusid.UserID)).One(ctx, r.db)
 	if err != nil {
 		return nil, ErrNotFound
 	}
@@ -55,9 +61,17 @@ func (r *servicedb) AddCategory(ctx context.Context, input *AddCategoryInput) (*
 		return nil, BadInput
 	}
 
+	sid := ctx.Value("sessionid")
+
+	gusid, err1 := model.Sessions(qm.Where("sessionid = ?", sid)).One(ctx, r.db)
+	if err1 != nil {
+		return nil, ErrNotFound
+	}
+
 	c := &model.Category{
-		Name: input.Name,
-		Icon: input.Icon,
+		UserID: gusid.UserID,
+		Name:   input.Name,
+		Icon:   input.Icon,
 	}
 
 	err := c.Insert(ctx, r.db, boil.Infer())

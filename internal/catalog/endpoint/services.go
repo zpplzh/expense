@@ -104,3 +104,15 @@ func Login(logi catalog.Service) endpoint.Endpoint {
 		return ex, err
 	}
 }
+
+func Logout(logou catalog.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		var input *catalog.Logoutinput
+		val, err := logou.Logout(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		return val, nil
+	}
+}

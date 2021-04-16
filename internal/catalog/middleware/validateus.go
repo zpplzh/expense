@@ -44,6 +44,8 @@ func (r *servicedb2) Validateus(next http.Handler) http.Handler {
 
 		}
 
-		next.ServeHTTP(w, req)
+		ctxs := context.WithValue(req.Context(), "sessionid", req.Header.Get("sessionid"))
+
+		next.ServeHTTP(w, req.WithContext(ctxs))
 	})
 }

@@ -30,9 +30,18 @@ type (
 	LoginOutput struct {
 		Sessionid string `json:"sessionid"`
 	}
+
+	Logoutinput struct {
+	}
+	Logoutoutput struct {
+	}
 )
 
 func (r *servicedb) SignUp(ctx context.Context, input *SignUpInput) (*SignUpOutput, error) {
+	if checkEmail(input.Email) == false || len(input.Password) < 7 {
+		return nil, BadInput
+
+	}
 	var h *Hash
 
 	p := h.HashandSalt(input.Password)
@@ -54,6 +63,10 @@ func (r *servicedb) SignUp(ctx context.Context, input *SignUpInput) (*SignUpOutp
 }
 
 func (r *servicedb) Login(ctx context.Context, input *LoginInput) (*LoginOutput, error) {
+	if checkEmail(input.Email) == false {
+		return nil, BadInput
+	}
+
 	var h *Hash
 
 	gus, err := model.Users(qm.Where("Email = ?", input.Email)).One(ctx, r.db)
@@ -100,4 +113,17 @@ func (r *servicedb) Login(ctx context.Context, input *LoginInput) (*LoginOutput,
 	return &LoginOutput{
 		Sessionid: tampsess,
 	}, nil
+}
+
+func (r *servicedb) Logout(ctx context.Context, input *Logoutinput) (*Logoutoutput, error) {
+	sid := ctx.Value("sessionid")
+	fmt.Println(sid)
+
+	h, err := model.Sessions(qm.Where("sessionid = ?", sid)).DeleteAll(ctx, r.db, true)
+	if err != nil {
+		return nil, ErrNotFound
+	}
+	fmt.Println(h)
+
+	return nil, nil
 }

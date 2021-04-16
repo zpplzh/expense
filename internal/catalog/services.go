@@ -29,6 +29,7 @@ type Service interface {
 
 	SignUp(ctx context.Context, input *SignUpInput) (*SignUpOutput, error)
 	Login(ctx context.Context, input *LoginInput) (*LoginOutput, error)
+	Logout(ctx context.Context, input *Logoutinput) (*Logoutoutput, error)
 }
 
 type servicedb struct {

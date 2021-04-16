@@ -2,6 +2,7 @@ package catalog
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/segmentio/ksuid"
@@ -51,29 +52,40 @@ type (
 )
 
 func (r *servicedb) AddExpense(ctx context.Context, input *AddExpenseInput) (*AddExpenseOutput, error) {
-	exists, err1 := model.Categories(qm.Where("name=?", input.Name)).Exists(ctx, r.db)
-	if err1 != nil || exists == false {
+	uid := ctx.Value("sessionid")
 
+	gusid, err1 := model.Sessions(qm.Where("sessionid = ?", uid)).One(ctx, r.db)
+	if err1 != nil {
 		return nil, ErrNotFound
-
 	}
 
-	id := ksuid.New()
-
-	inputex := &model.Expense{
-
-		ID:          id.String(),
-		Icon:        input.Icon,
-		Name:        input.Name,
-		Amount:      input.Amount,
-		Note:        null.StringFrom(input.Note),
-		ExpenseDate: input.ExpenseDate,
+	ex, err2 := model.Categories(qm.Where("name=? and user_id=?", input.Name, gusid.UserID)).One(ctx, r.db)
+	if err2 != nil {
+		return nil, ErrNotFound
 	}
 
-	err := inputex.Insert(ctx, r.db, boil.Infer())
-	if err != nil {
+	fmt.Println(ex.Icon, ex.UserID)
 
-		return nil, ErrDuplicate
+	if ex.Icon == input.Icon && ex.Name == input.Name && gusid.UserID == ex.UserID {
+		id := ksuid.New()
+
+		inputex := &model.Expense{
+			UserID:      gusid.UserID,
+			ID:          id.String(),
+			Icon:        input.Icon,
+			Name:        input.Name,
+			Amount:      input.Amount,
+			Note:        null.StringFrom(input.Note),
+			ExpenseDate: input.ExpenseDate,
+		}
+
+		err := inputex.Insert(ctx, r.db, boil.Infer())
+		if err != nil {
+
+			return nil, ErrDuplicate
+		}
+	} else {
+		return nil, ErrNotFound
 	}
 
 	return nil, nil

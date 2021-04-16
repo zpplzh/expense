@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 
@@ -36,23 +37,32 @@ func main() {
 
 	r := chi.NewRouter()
 	r.Use(secureMiddleware.Handler)
-	r.Use(svcm.Validateus)
 
-	//category
-	r.Post("/addcategory", httptransport.AddCategory(svc).ServeHTTP) // svc itu kirim receiver , addcategory(svc) return -> servehttp
-	r.Get("/getcategory/{category}", httptransport.GetCategory(svc))
-	r.Post("/deletecategory/{category}", httptransport.DelCategory(svc).ServeHTTP)
-	r.Get("/listcategories", httptransport.ListCategories(svc).ServeHTTP)
+	r.Group(func(c chi.Router) {
+		c.Use(svcm.Validateus)
 
-	//expenses
-	r.Post("/addexpense", httptransport.AddExpense(svc).ServeHTTP)
-	r.Get("/listexpenses", httptransport.ListExpenses(svc).ServeHTTP)
-	r.Get("/getexpense/{expense}", httptransport.GetExpense(svc).ServeHTTP)
+		//category
+		c.Post("/addcategory", httptransport.AddCategory(svc).ServeHTTP) // svc itu kirim receiver , addcategory(svc) return -> servehttp
+		c.Get("/getcategory/{category}", httptransport.GetCategory(svc))
+		c.Post("/deletecategory/{category}", httptransport.DelCategory(svc).ServeHTTP)
+		c.Get("/listcategories", httptransport.ListCategories(svc).ServeHTTP)
+
+		//expenses
+		c.Post("/addexpense", httptransport.AddExpense(svc).ServeHTTP)
+		c.Get("/listexpenses", httptransport.ListExpenses(svc).ServeHTTP)
+		c.Get("/getexpense/{expense}", httptransport.GetExpense(svc).ServeHTTP)
+
+		//user
+		c.Post("/logout", httptransport.Logout(svc).ServeHTTP)
+	})
 
 	//user
-	r.Post("/signup", httptransport.SignUp(svc).ServeHTTP)
-	r.Post("/login", httptransport.Login(svc).ServeHTTP)
+	r.Group(func(d chi.Router) {
+		d.Post("/signup", httptransport.SignUp(svc).ServeHTTP)
+		d.Post("/login", httptransport.Login(svc).ServeHTTP)
+
+	})
 
 	log.Println("Listening on ", conf.PortServer, "...")
-	http.ListenAndServe(conf.PortServer, r)
+	fmt.Println(http.ListenAndServe(conf.PortServer, r))
 }
