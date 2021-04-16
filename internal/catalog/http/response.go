@@ -22,7 +22,7 @@ func encodeResponse(ctx context.Context, w http.ResponseWriter, response interfa
 
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("X-XSS-Protection", "1;mode=block")
-	w.Header().Set("X-Frame-Options", "deny")
+	//w.Header().Set("X-Frame-Options", "deny")
 
 	return json.NewEncoder(w).Encode(response)
 }

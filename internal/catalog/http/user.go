@@ -27,6 +27,7 @@ func SignUp(sgnup catalog.Service) http.Handler {
 
 		//encoder
 		encodeResponse,
+		httptransport.ServerErrorEncoder(encodeError),
 	)
 }
 
@@ -47,5 +48,6 @@ func Login(logi catalog.Service) http.Handler {
 
 		//encoder
 		encodeResponse,
+		httptransport.ServerErrorEncoder(encodeError),
 	)
 }

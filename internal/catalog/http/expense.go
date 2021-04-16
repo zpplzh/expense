@@ -29,6 +29,7 @@ func AddExpense(addex catalog.Service) http.Handler { //interface getcat addcat
 
 		// Encoder.
 		encodeResponse,
+		httptransport.ServerErrorEncoder(encodeError),
 	)
 }
 
@@ -47,6 +48,7 @@ func ListExpenses(showallex catalog.Service) http.Handler { //interface getcat a
 
 		// Encoder.
 		encodeResponse,
+		httptransport.ServerErrorEncoder(encodeError),
 	)
 }
 
@@ -65,5 +67,6 @@ func GetExpense(getex catalog.Service) http.Handler { //interface getcat addcat
 
 		// Encoder.
 		encodeResponse,
+		httptransport.ServerErrorEncoder(encodeError),
 	)
 }

@@ -2,6 +2,8 @@ package catalog
 
 import (
 	"context"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/segmentio/ksuid"
@@ -63,25 +65,28 @@ func (r *servicedb) Login(ctx context.Context, input *LoginInput) (*LoginOutput,
 		return nil, ErrAuth
 
 	}
+
 	tampsess := ""
 	count := 0
 	for {
 
 		tampsess = RandSessionid()
-		exists, err1 := model.Sessions(qm.Where("sessionid=?", tampsess)).Exists(ctx, r.db)
+		exists, err1 := model.Sessions(qm.Where("sessionid=?", string(tampsess))).Exists(ctx, r.db)
 		if err1 == nil && exists == false {
+			fmt.Println(tampsess, exists)
 			break
-		}
-		count++
-		if count <= 5 {
+		} else {
+			count++
+			fmt.Println(count, tampsess)
 			if count == 5 {
 				break
 			}
 		}
 	}
+	t := strings.Replace(tampsess, "\u0000", "", -1)
 
 	inpt := &model.Session{
-		Sessionid: tampsess,
+		Sessionid: string(t),
 		UserID:    gus.UserID,
 		Expiry:    time.Now().Add(time.Minute * 15),
 	}
@@ -89,6 +94,7 @@ func (r *servicedb) Login(ctx context.Context, input *LoginInput) (*LoginOutput,
 	errd := inpt.Insert(ctx, r.db, boil.Infer())
 	if errd != nil {
 		return nil, ErrDuplicate
+
 	}
 
 	return &LoginOutput{
