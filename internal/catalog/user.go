@@ -32,6 +32,7 @@ type (
 	}
 
 	Logoutinput struct {
+		Sessionid string `json:"sessionid"`
 	}
 	Logoutoutput struct {
 	}
@@ -42,6 +43,7 @@ func (r *servicedb) SignUp(ctx context.Context, input *SignUpInput) (*SignUpOutp
 		return nil, BadInput
 
 	}
+
 	var h *Hash
 
 	p := h.HashandSalt(input.Password)
@@ -63,9 +65,7 @@ func (r *servicedb) SignUp(ctx context.Context, input *SignUpInput) (*SignUpOutp
 }
 
 func (r *servicedb) Login(ctx context.Context, input *LoginInput) (*LoginOutput, error) {
-	if checkEmail(input.Email) == false {
-		return nil, BadInput
-	}
+	//if checkEmail(input.Email) == false {	return nil, BadInput}
 
 	var h *Hash
 
@@ -116,14 +116,11 @@ func (r *servicedb) Login(ctx context.Context, input *LoginInput) (*LoginOutput,
 }
 
 func (r *servicedb) Logout(ctx context.Context, input *Logoutinput) (*Logoutoutput, error) {
-	sid := ctx.Value("sessionid")
-	fmt.Println(sid)
 
-	h, err := model.Sessions(qm.Where("sessionid = ?", sid)).DeleteAll(ctx, r.db, true)
+	_, err := model.Sessions(qm.Where("sessionid = ?", input.Sessionid)).DeleteAll(ctx, r.db, true)
 	if err != nil {
 		return nil, ErrNotFound
 	}
-	fmt.Println(h)
 
 	return nil, nil
 }

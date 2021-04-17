@@ -8,35 +8,6 @@ import (
 	"github.com/zappel/expense-server/internal/catalog"
 )
 
-func AddExpense(addex catalog.Service) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		input := request.(*catalog.AddExpenseInput)
-		_, err := addex.AddExpense(ctx, input)
-
-		return nil, err
-	}
-}
-
-func ListExpenses(showallex catalog.Service) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		var input *catalog.ListExpensesInput
-		var expenses []*catalog.ExpenseOutput
-
-		expenses, err := showallex.ListExpense(ctx, input)
-
-		return expenses, err
-	}
-}
-
-func GetExpense(getex catalog.Service) endpoint.Endpoint {
-	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		qry := request.(*catalog.GetExpenseInput)
-		viewex, err := getex.GetExpense(ctx, qry)
-		fmt.Println(viewex)
-		return viewex, err
-	}
-}
-
 func SignUp(siup catalog.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		input := request.(*catalog.SignUpInput)
@@ -58,7 +29,7 @@ func Login(logi catalog.Service) endpoint.Endpoint {
 
 func Logout(logou catalog.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		var input *catalog.Logoutinput
+		input := request.(*catalog.Logoutinput)
 		val, err := logou.Logout(ctx, input)
 		if err != nil {
 			return nil, err

@@ -28,23 +28,37 @@ func NewServicess(db *sqlx.DB) Aut {
 	}
 }
 
+type outps struct {
+	sesid string
+}
+
 func (r *servicedb2) ValidateUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		ro := req.Header.Get("sessionid")
 		ctxz := context.Background()
 
-		exists, err1 := model.Sessions(qm.Where("sessionid=?", ro)).Exists(ctxz, r.db)
-		if err1 != nil || exists == false {
-			//t := ErrNotFound
+		//exists, err1 := model.Sessions(qm.Where("sessionid=?", ro)).Exists(ctxz, r.db)
+		//if err1 != nil || exists == false {
+		//	//t := ErrNotFound
+		//	w.Header().Set("Content-Type", "application/json; charset=utf-8")
+		//	w.WriteHeader(http.StatusUnauthorized)
+		//	json.NewEncoder(w).Encode(map[string]interface{}{
+		//		"error": ErrNotFound,
+		//	})
+		//	return
+		//}
+
+		gusid, err1 := model.Sessions(qm.Where("sessionid = ?", ro)).One(ctxz, r.db)
+		if err1 != nil {
 			w.Header().Set("Content-Type", "application/json; charset=utf-8")
+			w.WriteHeader(http.StatusUnauthorized)
 			json.NewEncoder(w).Encode(map[string]interface{}{
 				"error": ErrNotFound,
 			})
 			return
-
 		}
 
-		ctxs := context.WithValue(req.Context(), "sessionid", req.Header.Get("sessionid"))
+		ctxs := context.WithValue(req.Context(), "uid", gusid.UserID)
 
 		next.ServeHTTP(w, req.WithContext(ctxs))
 	})

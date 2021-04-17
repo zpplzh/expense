@@ -1,4 +1,3 @@
-DROP TABLE IF EXISTS "category";
 
 CREATE TABLE "category" (
 
@@ -10,5 +9,5 @@ CREATE TABLE "category" (
     created_at timestamp with time zone,
     updated_at timestamp with time zone,
     deleted_at timestamp with time zone,
-    PRIMARY KEY (categoryid)
+    PRIMARY KEY (categoryid,name)
 );

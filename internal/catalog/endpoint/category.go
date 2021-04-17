@@ -33,12 +33,11 @@ func DelCategory(delcat catalog.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		input := request.(*catalog.DelCategoryInput)
 		err := delcat.DelCategory(ctx, input)
-
 		if err != nil {
 			return nil, err
 		}
 
-		return input.Name, nil
+		return nil, nil
 	}
 }
 

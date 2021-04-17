@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -44,7 +43,7 @@ func main() {
 		//category
 		c.Post("/addcategory", httptransport.AddCategory(svc).ServeHTTP) // svc itu kirim receiver , addcategory(svc) return -> servehttp
 		c.Get("/getcategory/{category}", httptransport.GetCategory(svc))
-		c.Post("/deletecategory/{category}", httptransport.DelCategory(svc).ServeHTTP)
+		c.Delete("/deletecategory/{category}", httptransport.DelCategory(svc).ServeHTTP)
 		c.Get("/listcategories", httptransport.ListCategories(svc).ServeHTTP)
 
 		//expenses
@@ -64,5 +63,5 @@ func main() {
 	})
 
 	log.Println("Listening on ", conf.PortServer, "...")
-	fmt.Println(http.ListenAndServe(conf.PortServer, r))
+	http.ListenAndServe(conf.PortServer, r)
 }

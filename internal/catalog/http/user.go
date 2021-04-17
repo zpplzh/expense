@@ -59,7 +59,10 @@ func Logout(logo catalog.Service) http.Handler {
 
 		//decoder
 		func(_ context.Context, r *http.Request) (interface{}, error) {
-			var inp catalog.Logoutinput
+			ro := r.Header.Get("sessionid")
+			inp := catalog.Logoutinput{
+				Sessionid: ro,
+			}
 
 			if err := json.NewDecoder(r.Body).Decode(&inp); err != nil {
 

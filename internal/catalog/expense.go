@@ -57,25 +57,20 @@ func (r *servicedb) AddExpense(ctx context.Context, input *AddExpenseInput) (*Ad
 		return nil, BadInput
 	}
 
-	uid := ctx.Value("sessionid")
+	uid := ctx.Value("uid")
 
-	outp, err1 := r.GetID(ctx, uid)
-	if err1 != nil {
-		return nil, ErrNotFound
-	}
-
-	ex, err2 := model.Categories(qm.Where("name=? and user_id=?", input.Name, outp.sesid)).One(ctx, r.db)
+	ex, err2 := model.Categories(qm.Where("name=? and user_id=?", input.Name, uid.(string))).One(ctx, r.db)
 	if err2 != nil {
 		return nil, ErrNotFound
 	}
 
 	fmt.Println(ex.Icon, ex.UserID)
 
-	if ex.Icon == input.Icon && ex.Name == input.Name && outp.sesid == ex.UserID {
+	if ex.Icon == input.Icon && ex.Name == input.Name && uid.(string) == ex.UserID {
 		id := ksuid.New()
 
 		inputex := &model.Expense{
-			UserID:      outp.sesid,
+			UserID:      uid.(string),
 			ID:          id.String(),
 			Icon:        input.Icon,
 			Name:        input.Name,
@@ -97,15 +92,14 @@ func (r *servicedb) AddExpense(ctx context.Context, input *AddExpenseInput) (*Ad
 }
 
 func (r *servicedb) ListExpense(ctx context.Context, input *ListExpensesInput) ([]*ExpenseOutput, error) {
-
 	allexarr := []*ExpenseOutput{}
-
-	allcat, err := model.Expenses(qm.Select("*")).All(ctx, r.db)
+	uid := ctx.Value(string("uid"))
+	allex, err := model.Expenses(qm.Select("*"), qm.Where("user_id=?", uid.(string))).All(ctx, r.db)
 	if err != nil {
 		return nil, ErrNotFound
 	}
 
-	for _, val := range allcat {
+	for _, val := range allex {
 		allexarr = append(allexarr, &ExpenseOutput{
 			Id:          val.ID,
 			Name:        val.Name,
@@ -120,8 +114,8 @@ func (r *servicedb) ListExpense(ctx context.Context, input *ListExpensesInput) (
 }
 
 func (r *servicedb) DelExpense(ctx context.Context, input *DelExpenseInput) error {
-	// kalau ga pake bintang
-	_, err := model.Expenses(qm.Where("Id = ?", input.Id)).DeleteAll(ctx, r.db, true)
+	uid := ctx.Value(string("uid"))
+	_, err := model.Expenses(qm.Where("Id = ? AND user_id=?", input.Id, uid.(string))).DeleteAll(ctx, r.db, true)
 	if err != nil {
 		return ErrNotFound
 	}

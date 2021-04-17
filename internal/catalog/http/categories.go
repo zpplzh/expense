@@ -11,11 +11,6 @@ import (
 	"github.com/zappel/expense-server/internal/catalog/endpoint"
 )
 
-type Resp struct {
-	Message string `json:"message"`
-	Err     string `json:"errormessage"`
-}
-
 func GetCategory(Getcat catalog.Service) http.HandlerFunc { //interface getcat addcat
 
 	return httptransport.NewServer(

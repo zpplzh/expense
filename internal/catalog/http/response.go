@@ -43,9 +43,10 @@ func codeFrom(err error) int {
 	switch err {
 
 	case catalog.ErrNotFound:
-		return http.StatusBadRequest
-	case catalog.ErrDuplicate:
 		return http.StatusNotFound
+	case catalog.ErrDuplicate, catalog.DataExistErr:
+		return http.StatusConflict
+
 	default:
 		return http.StatusInternalServerError
 	}

@@ -2,7 +2,6 @@ package catalog
 
 import (
 	"crypto/rand"
-	"fmt"
 	"log"
 	"math/big"
 	"regexp"
@@ -54,11 +53,12 @@ func RandSessionid() string {
 
 func checkEmail(email string) bool {
 	var emailRegex = regexp.MustCompile("^[a-zA-Z0-9.!#$%&'*+\\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$")
+
 	if len(email) < 3 && len(email) > 254 {
 		return false
 	}
-	fmt.Println(emailRegex)
-	return true //emailRegex.MatchString(email)
+
+	return emailRegex.MatchString(email)
 }
 
 func checkInput(in string) bool {
