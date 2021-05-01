@@ -41,15 +41,16 @@ func main() {
 		c.Use(svcm.ValidateUser)
 
 		//category
-		c.Post("/addcategory", httptransport.AddCategory(svc).ServeHTTP) // svc itu kirim receiver , addcategory(svc) return -> servehttp
-		c.Get("/getcategory/{category}", httptransport.GetCategory(svc))
-		c.Delete("/deletecategory/{category}", httptransport.DelCategory(svc).ServeHTTP)
-		c.Get("/listcategories", httptransport.ListCategories(svc).ServeHTTP)
+		c.Post("/category", httptransport.AddCategory(svc).ServeHTTP) // svc itu kirim receiver , addcategory(svc) return -> servehttp
+		c.Get("/category/{id}", httptransport.GetCategory(svc))
+		c.Delete("/category/{id}", httptransport.DelCategory(svc).ServeHTTP)
+		c.Get("/categories", httptransport.ListCategories(svc).ServeHTTP)
+		c.Post("/category/update", httptransport.UpdateCategory(svc).ServeHTTP)
 
 		//expenses
-		c.Post("/addexpense", httptransport.AddExpense(svc).ServeHTTP)
-		c.Get("/listexpenses", httptransport.ListExpenses(svc).ServeHTTP)
-		c.Get("/getexpense/{expense}", httptransport.GetExpense(svc).ServeHTTP)
+		c.Post("/expense", httptransport.AddExpense(svc).ServeHTTP)
+		c.Get("/expenses", httptransport.ListExpenses(svc).ServeHTTP)
+		c.Get("/expense/{id}", httptransport.GetExpense(svc).ServeHTTP)
 
 		//user
 		c.Post("/logout", httptransport.Logout(svc).ServeHTTP)
