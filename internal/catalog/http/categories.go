@@ -63,7 +63,7 @@ func DelCategory(Delcat catalog.Service) http.Handler { //interface getcat addca
 		// Decoder.
 		func(_ context.Context, r *http.Request) (interface{}, error) {
 			var qry catalog.DelCategoryInput
-			qry.Name = chi.URLParam(r, "id")
+			qry.Categoryid = chi.URLParam(r, "id")
 			return &qry, nil
 		},
 

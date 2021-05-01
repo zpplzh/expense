@@ -36,3 +36,15 @@ func GetExpense(getex catalog.Service) endpoint.Endpoint {
 		return viewex, err
 	}
 }
+
+func DelExpense(delex catalog.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		input := request.(*catalog.DelExpenseInput)
+		err := delex.DelExpense(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+
+		return nil, nil
+	}
+}

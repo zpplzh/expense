@@ -70,3 +70,23 @@ func GetExpense(getex catalog.Service) http.Handler { //interface getcat addcat
 		httptransport.ServerErrorEncoder(encodeError),
 	)
 }
+
+func DelExpense(Delex catalog.Service) http.Handler { //interface getcat addcat
+	// Endpoint.
+	return httptransport.NewServer(
+		//endpoint
+		endpoint.DelExpense(Delex),
+
+		// Decoder.
+		func(_ context.Context, r *http.Request) (interface{}, error) {
+			var qry catalog.DelExpenseInput
+			qry.Id = chi.URLParam(r, "id")
+			return &qry, nil
+		},
+
+		// Encoder.
+		encodeResponse,
+
+		httptransport.ServerErrorEncoder(encodeError),
+	)
+}

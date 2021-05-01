@@ -3,7 +3,9 @@ package middleware
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -36,8 +38,11 @@ func (r *servicedb2) ValidateUser(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
 		ro := req.Header.Get("sessionid")
 		ctxz := context.Background()
+		t := time.Now()
+		ts := t.Format(time.RFC3339)
+		fmt.Println(ts)
 
-		gusid, err1 := model.Sessions(qm.Where("sessionid = ? and expiry < ", ro)).One(ctxz, r.db)
+		gusid, err1 := model.Sessions(qm.Where("sessionid = ? and expiry > ? ", ro, ts)).One(ctxz, r.db)
 		if err1 != nil {
 			w.Header().Set("Content-Type", "application/json; charset=utf-8")
 			w.WriteHeader(http.StatusUnauthorized)
