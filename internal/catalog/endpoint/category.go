@@ -54,3 +54,14 @@ func ListCategories(showallcat catalog.Service) endpoint.Endpoint {
 		return categories, nil
 	}
 }
+
+func UpdateCategory(upcat catalog.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		input := request.(*catalog.UpdateCategoryInput)
+		upc, err := upcat.UpdateCategory(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		return upc, nil
+	}
+}

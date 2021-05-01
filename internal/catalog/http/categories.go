@@ -93,3 +93,25 @@ func ListCategories(showallcat catalog.Service) http.Handler { //interface getca
 		httptransport.ServerErrorEncoder(encodeError),
 	)
 }
+
+func UpdateCategory(upcat catalog.Service) http.Handler {
+	//catalog.Service itu function nya tapi dia terima receiver svc yang di main karna di catalog minta receiver
+	return httptransport.NewServer(
+		// Endpoint.
+		endpoint.UpdateCategory(upcat),
+
+		// Decoder.
+		func(_ context.Context, r *http.Request) (interface{}, error) {
+			var input catalog.UpdateCategoryInput
+			if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+
+			}
+			return &input, nil
+		},
+
+		// Encoder.
+		encodeResponse,
+
+		httptransport.ServerErrorEncoder(encodeError),
+	)
+}

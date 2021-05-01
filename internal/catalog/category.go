@@ -125,6 +125,21 @@ func (r *servicedb) ListCategories(ctx context.Context, input *ListCategoriesInp
 }
 
 func (r *servicedb) UpdateCategory(ctx context.Context, input *UpdateCategoryInput) (*UpdateCategoryOutput, error) {
+	if input.Name == "" || input.Icon == "" || !checkInput(input.Name) {
+		return nil, BadInput
+	}
+	fmt.Println(checkInput(input.Name))
+
+	upca, err := model.FindCategory(ctx, r.db, input.Categoryid)
+	if err != nil {
+		return nil, ErrNotFound
+	}
+	upca.Name = input.Name
+	upca.Icon = input.Icon
+	RowsAffected, err := upca.Update(ctx, r.db, boil.Infer())
+	if err != nil && RowsAffected == 0 {
+		return nil, ErrNotFound
+	}
 
 	return nil, nil
 
