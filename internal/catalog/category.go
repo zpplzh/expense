@@ -97,14 +97,14 @@ func (r *servicedb) AddCategory(ctx context.Context, input *AddCategoryInput) (*
 func (r *servicedb) DelCategory(ctx context.Context, input *DelCategoryInput) error {
 	uid := ctx.Value(string("uid"))
 
-	exists, err1 := model.Categories(qm.Where("user_id=? AND category_id=?", uid.(string), input.Categoryid)).Exists(ctx, r.db)
+	exists, err1 := model.Categories(qm.Where("user_id=? AND categoryid=?", uid.(string), input.Categoryid)).Exists(ctx, r.db)
 	if err1 != nil || exists == false {
+
 		return ErrNotFound
 	}
 
-	_, err := model.Categories(qm.Where("name = ? AND user_id=?", input.Categoryid, uid.(string))).DeleteAll(ctx, r.db, true)
+	_, err := model.Categories(qm.Where("categoryid = ? AND user_id=?", input.Categoryid, uid.(string))).DeleteAll(ctx, r.db, true)
 	if err != nil {
-		fmt.Println(err)
 		return ErrNotFound
 	}
 

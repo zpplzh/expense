@@ -48,3 +48,14 @@ func DelExpense(delex catalog.Service) endpoint.Endpoint {
 		return nil, nil
 	}
 }
+
+func UpdateExpense(upex catalog.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		input := request.(*catalog.UpdateExpenseInput)
+		upc, err := upex.UpdateExpense(ctx, input)
+		if err != nil {
+			return nil, err
+		}
+		return upc, nil
+	}
+}

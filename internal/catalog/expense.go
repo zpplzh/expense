@@ -33,7 +33,7 @@ type (
 		CategoryId  string    `json: "categoryid"`
 		Amount      int       `json: "amount"`
 		Note        string    `json: note`
-		ExpenseData time.Time `json: "expenseDate"`
+		ExpenseDate time.Time `json: "expenseDate"`
 	}
 
 	ListExpensesInput struct{}
@@ -43,8 +43,14 @@ type (
 	}
 
 	UpdateExpenseInput struct {
-		Id string `json:"id"`
+		Id          string    `json:"id"`
+		CategoryId  string    `json: "categoryid"`
+		Amount      int       `json: "amount"`
+		Note        string    `json: note`
+		ExpenseDate time.Time `json: "expenseDate"`
 	}
+
+	UpdateExpenseOutput struct{}
 )
 
 func (r *servicedb) AddExpense(ctx context.Context, input *AddExpenseInput) (*AddExpenseOutput, error) {
@@ -94,7 +100,7 @@ func (r *servicedb) ListExpense(ctx context.Context, input *ListExpensesInput) (
 			CategoryId:  val.Categoryid.String,
 			Amount:      val.Amount,
 			Note:        val.Note.String,
-			ExpenseData: val.ExpenseDate,
+			ExpenseDate: val.ExpenseDate,
 		})
 	}
 
@@ -107,7 +113,6 @@ func (r *servicedb) DelExpense(ctx context.Context, input *DelExpenseInput) erro
 	if err != nil {
 		return ErrNotFound
 	}
-
 	return nil
 }
 
@@ -122,7 +127,29 @@ func (r *servicedb) GetExpense(ctx context.Context, input *GetExpenseInput) (*Ex
 		CategoryId:  getex.Categoryid.String,
 		Amount:      getex.Amount,
 		Note:        getex.Note.String,
-		ExpenseData: getex.ExpenseDate,
+		ExpenseDate: getex.ExpenseDate,
 	}, nil
+
+}
+
+func (r *servicedb) UpdateExpense(ctx context.Context, input *UpdateExpenseInput) (*UpdateExpenseOutput, error) {
+	if input.Amount <= 0 {
+		return nil, BadInput
+	}
+
+	upex, err := model.FindExpense(ctx, r.db, input.Id)
+	if err != nil {
+		return nil, ErrNotFound
+	}
+	upex.Categoryid = null.StringFrom(input.CategoryId)
+	upex.Amount = input.Amount
+	upex.ExpenseDate = input.ExpenseDate
+	upex.Note = null.StringFrom(input.Note)
+	RowsAffected, err := upex.Update(ctx, r.db, boil.Infer())
+	if err != nil && RowsAffected == 0 {
+		return nil, ErrNotFound
+	}
+
+	return nil, nil
 
 }

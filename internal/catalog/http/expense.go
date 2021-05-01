@@ -90,3 +90,26 @@ func DelExpense(Delex catalog.Service) http.Handler { //interface getcat addcat
 		httptransport.ServerErrorEncoder(encodeError),
 	)
 }
+
+func UpdateExpense(upex catalog.Service) http.Handler {
+	//catalog.Service itu function nya tapi dia terima receiver svc yang di main karna di catalog minta receiver
+	return httptransport.NewServer(
+		// Endpoint.
+		endpoint.UpdateExpense(upex),
+
+		// Decoder.
+		func(_ context.Context, r *http.Request) (interface{}, error) {
+			var input catalog.UpdateExpenseInput
+			input.Id = chi.URLParam(r, "id")
+			if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+
+			}
+			return &input, nil
+		},
+
+		// Encoder.
+		encodeResponse,
+
+		httptransport.ServerErrorEncoder(encodeError),
+	)
+}

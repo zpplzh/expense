@@ -57,7 +57,6 @@ func (r *servicedb) SignUp(ctx context.Context, input *SignUpInput) (*SignUpOutp
 
 	err := inputus.Insert(ctx, r.db, boil.Infer())
 	if err != nil {
-		fmt.Println(err)
 		return nil, ErrDuplicate
 	}
 
@@ -86,7 +85,6 @@ func (r *servicedb) Login(ctx context.Context, input *LoginInput) (*LoginOutput,
 		tampsess = RandSessionid()
 		exists, err1 := model.Sessions(qm.Where("sessionid=?", string(tampsess))).Exists(ctx, r.db)
 		if err1 == nil && exists == false {
-			fmt.Println(tampsess, exists)
 			break
 		} else {
 			count++

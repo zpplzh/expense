@@ -3,7 +3,6 @@ package middleware
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -40,7 +39,6 @@ func (r *servicedb2) ValidateUser(next http.Handler) http.Handler {
 		ctxz := context.Background()
 		t := time.Now()
 		ts := t.Format(time.RFC3339)
-		fmt.Println(ts)
 
 		gusid, err1 := model.Sessions(qm.Where("sessionid = ? and expiry > ? ", ro, ts)).One(ctxz, r.db)
 		if err1 != nil {

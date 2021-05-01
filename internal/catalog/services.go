@@ -26,7 +26,7 @@ type Service interface {
 	AddExpense(ctx context.Context, input *AddExpenseInput) (*AddExpenseOutput, error)
 	ListExpense(ctx context.Context, input *ListExpensesInput) ([]*ExpenseOutput, error)
 	DelExpense(ctx context.Context, input *DelExpenseInput) error
-	//UpdateExpense(ctx context.Context, input *UpdateExpenseInput) error
+	UpdateExpense(ctx context.Context, input *UpdateExpenseInput) (*UpdateExpenseOutput, error)
 
 	SignUp(ctx context.Context, input *SignUpInput) (*SignUpOutput, error)
 	Login(ctx context.Context, input *LoginInput) (*LoginOutput, error)

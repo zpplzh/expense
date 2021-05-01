@@ -122,10 +122,14 @@ var CategoryWhere = struct {
 
 // CategoryRels is where relationship names are stored.
 var CategoryRels = struct {
-}{}
+	CategoryidExpenses string
+}{
+	CategoryidExpenses: "CategoryidExpenses",
+}
 
 // categoryR is where relationships are stored.
 type categoryR struct {
+	CategoryidExpenses ExpenseSlice `boil:"CategoryidExpenses" json:"CategoryidExpenses" toml:"CategoryidExpenses" yaml:"CategoryidExpenses"`
 }
 
 // NewStruct creates a new relationship struct
@@ -416,6 +420,250 @@ func (q categoryQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (b
 	}
 
 	return count > 0, nil
+}
+
+// CategoryidExpenses retrieves all the expense's Expenses with an executor via categoryid column.
+func (o *Category) CategoryidExpenses(mods ...qm.QueryMod) expenseQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"expenses\".\"categoryid\"=?", o.Categoryid),
+		qmhelper.WhereIsNull("\"expenses\".\"deleted_at\""),
+	)
+
+	query := Expenses(queryMods...)
+	queries.SetFrom(query.Query, "\"expenses\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"expenses\".*"})
+	}
+
+	return query
+}
+
+// LoadCategoryidExpenses allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (categoryL) LoadCategoryidExpenses(ctx context.Context, e boil.ContextExecutor, singular bool, maybeCategory interface{}, mods queries.Applicator) error {
+	var slice []*Category
+	var object *Category
+
+	if singular {
+		object = maybeCategory.(*Category)
+	} else {
+		slice = *maybeCategory.(*[]*Category)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &categoryR{}
+		}
+		args = append(args, object.Categoryid)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &categoryR{}
+			}
+
+			for _, a := range args {
+				if queries.Equal(a, obj.Categoryid) {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.Categoryid)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.From(`expenses`),
+		qm.WhereIn(`expenses.categoryid in ?`, args...),
+		qmhelper.WhereIsNull(`expenses.deleted_at`),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load expenses")
+	}
+
+	var resultSlice []*Expense
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice expenses")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on expenses")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for expenses")
+	}
+
+	if len(expenseAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.CategoryidExpenses = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &expenseR{}
+			}
+			foreign.R.CategoryidCategory = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if queries.Equal(local.Categoryid, foreign.Categoryid) {
+				local.R.CategoryidExpenses = append(local.R.CategoryidExpenses, foreign)
+				if foreign.R == nil {
+					foreign.R = &expenseR{}
+				}
+				foreign.R.CategoryidCategory = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// AddCategoryidExpenses adds the given related objects to the existing relationships
+// of the category, optionally inserting them as new records.
+// Appends related to o.R.CategoryidExpenses.
+// Sets related.R.CategoryidCategory appropriately.
+func (o *Category) AddCategoryidExpenses(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Expense) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			queries.Assign(&rel.Categoryid, o.Categoryid)
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"expenses\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"categoryid"}),
+				strmangle.WhereClause("\"", "\"", 2, expensePrimaryKeyColumns),
+			)
+			values := []interface{}{o.Categoryid, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			queries.Assign(&rel.Categoryid, o.Categoryid)
+		}
+	}
+
+	if o.R == nil {
+		o.R = &categoryR{
+			CategoryidExpenses: related,
+		}
+	} else {
+		o.R.CategoryidExpenses = append(o.R.CategoryidExpenses, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &expenseR{
+				CategoryidCategory: o,
+			}
+		} else {
+			rel.R.CategoryidCategory = o
+		}
+	}
+	return nil
+}
+
+// SetCategoryidExpenses removes all previously related items of the
+// category replacing them completely with the passed
+// in related items, optionally inserting them as new records.
+// Sets o.R.CategoryidCategory's CategoryidExpenses accordingly.
+// Replaces o.R.CategoryidExpenses with related.
+// Sets related.R.CategoryidCategory's CategoryidExpenses accordingly.
+func (o *Category) SetCategoryidExpenses(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Expense) error {
+	query := "update \"expenses\" set \"categoryid\" = null where \"categoryid\" = $1"
+	values := []interface{}{o.Categoryid}
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, query)
+		fmt.Fprintln(writer, values)
+	}
+	_, err := exec.ExecContext(ctx, query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+
+	if o.R != nil {
+		for _, rel := range o.R.CategoryidExpenses {
+			queries.SetScanner(&rel.Categoryid, nil)
+			if rel.R == nil {
+				continue
+			}
+
+			rel.R.CategoryidCategory = nil
+		}
+
+		o.R.CategoryidExpenses = nil
+	}
+	return o.AddCategoryidExpenses(ctx, exec, insert, related...)
+}
+
+// RemoveCategoryidExpenses relationships from objects passed in.
+// Removes related items from R.CategoryidExpenses (uses pointer comparison, removal does not keep order)
+// Sets related.R.CategoryidCategory.
+func (o *Category) RemoveCategoryidExpenses(ctx context.Context, exec boil.ContextExecutor, related ...*Expense) error {
+	var err error
+	for _, rel := range related {
+		queries.SetScanner(&rel.Categoryid, nil)
+		if rel.R != nil {
+			rel.R.CategoryidCategory = nil
+		}
+		if _, err = rel.Update(ctx, exec, boil.Whitelist("categoryid")); err != nil {
+			return err
+		}
+	}
+	if o.R == nil {
+		return nil
+	}
+
+	for _, rel := range related {
+		for i, ri := range o.R.CategoryidExpenses {
+			if rel != ri {
+				continue
+			}
+
+			ln := len(o.R.CategoryidExpenses)
+			if ln > 1 && i < ln-1 {
+				o.R.CategoryidExpenses[i] = o.R.CategoryidExpenses[ln-1]
+			}
+			o.R.CategoryidExpenses = o.R.CategoryidExpenses[:ln-1]
+			break
+		}
+	}
+
+	return nil
 }
 
 // Categories retrieves all the records using an executor.
