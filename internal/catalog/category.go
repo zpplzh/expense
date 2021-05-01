@@ -34,7 +34,9 @@ type (
 	ListCategoriesInput struct{}
 
 	UpdateCategoryInput struct {
-		name string `json:"name"`
+		Categoryid string `json:"categoryid"`
+		Name       string `json:"name"`
+		Icon       string `json:"icon"`
 	}
 
 	UpdateCategoryOutput struct{}
@@ -130,7 +132,7 @@ func (r *servicedb) UpdateCategory(ctx context.Context, input *UpdateCategoryInp
 	}
 	fmt.Println(checkInput(input.Name))
 
-	upca, err := model.FindCategory(ctx, r.db, input.Categoryid)
+	upca, err := model.FindCategory(ctx, r.db, input.Categoryid, name string, selectCols ...string)
 	if err != nil {
 		return nil, ErrNotFound
 	}
