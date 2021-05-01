@@ -45,7 +45,7 @@ func main() {
 		c.Get("/category/{id}", httptransport.GetCategory(svc))
 		c.Delete("/category/{id}", httptransport.DelCategory(svc).ServeHTTP)
 		c.Get("/categories", httptransport.ListCategories(svc).ServeHTTP)
-		c.Post("/category/update", httptransport.UpdateCategory(svc).ServeHTTP)
+		c.Post("/category/{id}", httptransport.UpdateCategory(svc).ServeHTTP)
 
 		//expenses
 		c.Post("/expense", httptransport.AddExpense(svc).ServeHTTP)

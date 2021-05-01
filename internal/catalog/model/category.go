@@ -140,7 +140,7 @@ var (
 	categoryAllColumns            = []string{"categoryid", "name", "icon", "user_id", "created_at", "updated_at", "deleted_at"}
 	categoryColumnsWithoutDefault = []string{"categoryid", "name", "icon", "user_id", "created_at", "updated_at", "deleted_at"}
 	categoryColumnsWithDefault    = []string{}
-	categoryPrimaryKeyColumns     = []string{"categoryid", "name"}
+	categoryPrimaryKeyColumns     = []string{"categoryid"}
 )
 
 type (
@@ -426,7 +426,7 @@ func Categories(mods ...qm.QueryMod) categoryQuery {
 
 // FindCategory retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindCategory(ctx context.Context, exec boil.ContextExecutor, categoryid string, name string, selectCols ...string) (*Category, error) {
+func FindCategory(ctx context.Context, exec boil.ContextExecutor, categoryid string, selectCols ...string) (*Category, error) {
 	categoryObj := &Category{}
 
 	sel := "*"
@@ -434,10 +434,10 @@ func FindCategory(ctx context.Context, exec boil.ContextExecutor, categoryid str
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from \"category\" where \"categoryid\"=$1 AND \"name\"=$2 and \"deleted_at\" is null", sel,
+		"select %s from \"category\" where \"categoryid\"=$1 and \"deleted_at\" is null", sel,
 	)
 
-	q := queries.Raw(query, categoryid, name)
+	q := queries.Raw(query, categoryid)
 
 	err := q.Bind(ctx, exec, categoryObj)
 	if err != nil {
@@ -813,12 +813,12 @@ func (o *Category) Delete(ctx context.Context, exec boil.ContextExecutor, hardDe
 	)
 	if hardDelete {
 		args = queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), categoryPrimaryKeyMapping)
-		sql = "DELETE FROM \"category\" WHERE \"categoryid\"=$1 AND \"name\"=$2"
+		sql = "DELETE FROM \"category\" WHERE \"categoryid\"=$1"
 	} else {
 		currTime := time.Now().In(boil.GetLocation())
 		o.DeletedAt = null.TimeFrom(currTime)
 		wl := []string{"deleted_at"}
-		sql = fmt.Sprintf("UPDATE \"category\" SET %s WHERE \"categoryid\"=$2 AND \"name\"=$3",
+		sql = fmt.Sprintf("UPDATE \"category\" SET %s WHERE \"categoryid\"=$2",
 			strmangle.SetParamNames("\"", "\"", 1, wl),
 		)
 		valueMapping, err := queries.BindMapping(categoryType, categoryMapping, append(wl, categoryPrimaryKeyColumns...))
@@ -945,7 +945,7 @@ func (o CategorySlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor,
 // Reload refetches the object from the database
 // using the primary keys with an executor.
 func (o *Category) Reload(ctx context.Context, exec boil.ContextExecutor) error {
-	ret, err := FindCategory(ctx, exec, o.Categoryid, o.Name)
+	ret, err := FindCategory(ctx, exec, o.Categoryid)
 	if err != nil {
 		return err
 	}
@@ -985,16 +985,16 @@ func (o *CategorySlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor
 }
 
 // CategoryExists checks if the Category row exists.
-func CategoryExists(ctx context.Context, exec boil.ContextExecutor, categoryid string, name string) (bool, error) {
+func CategoryExists(ctx context.Context, exec boil.ContextExecutor, categoryid string) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from \"category\" where \"categoryid\"=$1 AND \"name\"=$2 and \"deleted_at\" is null limit 1)"
+	sql := "select exists(select 1 from \"category\" where \"categoryid\"=$1 and \"deleted_at\" is null limit 1)"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
 		fmt.Fprintln(writer, sql)
-		fmt.Fprintln(writer, categoryid, name)
+		fmt.Fprintln(writer, categoryid)
 	}
-	row := exec.QueryRowContext(ctx, sql, categoryid, name)
+	row := exec.QueryRowContext(ctx, sql, categoryid)
 
 	err := row.Scan(&exists)
 	if err != nil {

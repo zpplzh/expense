@@ -132,7 +132,7 @@ func (r *servicedb) UpdateCategory(ctx context.Context, input *UpdateCategoryInp
 	}
 	fmt.Println(checkInput(input.Name))
 
-	upca, err := model.FindCategory(ctx, r.db, input.Categoryid, name string, selectCols ...string)
+	upca, err := model.FindCategory(ctx, r.db, input.Categoryid)
 	if err != nil {
 		return nil, ErrNotFound
 	}

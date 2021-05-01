@@ -250,7 +250,7 @@ func testCategoriesExists(t *testing.T) {
 		t.Error(err)
 	}
 
-	e, err := CategoryExists(ctx, tx, o.Categoryid, o.Name)
+	e, err := CategoryExists(ctx, tx, o.Categoryid)
 	if err != nil {
 		t.Errorf("Unable to check if Category exists: %s", err)
 	}
@@ -276,7 +276,7 @@ func testCategoriesFind(t *testing.T) {
 		t.Error(err)
 	}
 
-	categoryFound, err := FindCategory(ctx, tx, o.Categoryid, o.Name)
+	categoryFound, err := FindCategory(ctx, tx, o.Categoryid)
 	if err != nil {
 		t.Error(err)
 	}

@@ -7,5 +7,6 @@ CREATE TABLE "users" (
     created_at timestamp with time zone,
     updated_at timestamp with time zone,
     deleted_at timestamp with time zone,
-    PRIMARY KEY (user_id)
+    PRIMARY KEY (user_id),
+    CONSTRAINT email_unique UNIQUE (email)
 );

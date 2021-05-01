@@ -61,7 +61,7 @@ func GetExpense(getex catalog.Service) http.Handler { //interface getcat addcat
 		// Decoder.
 		func(_ context.Context, r *http.Request) (interface{}, error) {
 			var qry catalog.GetExpenseInput
-			qry.Id = chi.URLParam(r, "expense")
+			qry.Id = chi.URLParam(r, "id")
 			return &qry, nil
 		},
 

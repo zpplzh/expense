@@ -20,7 +20,7 @@ func GetCategory(Getcat catalog.Service) http.HandlerFunc { //interface getcat a
 		// Decoder.
 		func(_ context.Context, r *http.Request) (interface{}, error) {
 			var qry catalog.GetCategoryInput
-			qry.Name = chi.URLParam(r, "category")
+			qry.Name = chi.URLParam(r, "id")
 			return &qry, nil
 		},
 
@@ -63,7 +63,7 @@ func DelCategory(Delcat catalog.Service) http.Handler { //interface getcat addca
 		// Decoder.
 		func(_ context.Context, r *http.Request) (interface{}, error) {
 			var qry catalog.DelCategoryInput
-			qry.Name = chi.URLParam(r, "category")
+			qry.Name = chi.URLParam(r, "id")
 			return &qry, nil
 		},
 
@@ -103,6 +103,7 @@ func UpdateCategory(upcat catalog.Service) http.Handler {
 		// Decoder.
 		func(_ context.Context, r *http.Request) (interface{}, error) {
 			var input catalog.UpdateCategoryInput
+			input.Categoryid = chi.URLParam(r, "id")
 			if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 
 			}
