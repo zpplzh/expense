@@ -669,7 +669,7 @@ func testExpensesSelect(t *testing.T) {
 }
 
 var (
-	expenseDBTypes = map[string]string{`ID`: `text`, `Name`: `text`, `Icon`: `text`, `Amount`: `integer`, `Note`: `text`, `ExpenseDate`: `date`, `UserID`: `text`, `Sequence`: `integer`, `CreatedAt`: `timestamp with time zone`, `UpdatedAt`: `timestamp with time zone`, `DeletedAt`: `timestamp with time zone`}
+	expenseDBTypes = map[string]string{`ID`: `text`, `Categoryid`: `text`, `Amount`: `integer`, `Note`: `text`, `ExpenseDate`: `date`, `UserID`: `text`, `CreatedAt`: `timestamp with time zone`, `UpdatedAt`: `timestamp with time zone`, `DeletedAt`: `timestamp with time zone`}
 	_              = bytes.MinRead
 )
 

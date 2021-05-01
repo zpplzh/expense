@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/segmentio/ksuid"
-
 	null "github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
@@ -20,21 +19,18 @@ type (
 	}
 
 	AddExpenseInput struct {
-		UserID      string    `json: "Userid"`
-		Id          string    `json: "Id"`
-		Icon        string    `json:"Icon"`
-		Name        string    `json:"CategoryName"`
-		Amount      int       `json:"Amount"`
-		Note        string    `json:"Note"`
-		ExpenseDate time.Time `json:"ExpenseDate"`
+		UserID      string    `json: "userid"`
+		CategoryId  string    `json: "categoryod"`
+		Amount      int       `json:"amount"`
+		Note        string    `json:"note"`
+		ExpenseDate time.Time `json:"expensedate"`
 	}
 
 	AddExpenseOutput struct{}
 
 	ExpenseOutput struct {
 		Id          string    `json: "id"`
-		Icon        string    `json: "icon"`
-		Name        string    `json: "categoryName"`
+		CategoryId  string    `json: "categoryid"`
 		Amount      int       `json: "amount"`
 		Note        string    `json: note`
 		ExpenseData time.Time `json: "expenseDate"`
@@ -53,27 +49,20 @@ type (
 
 func (r *servicedb) AddExpense(ctx context.Context, input *AddExpenseInput) (*AddExpenseOutput, error) {
 
-	if input.Icon == "" || input.Name == "" || checkInput(input.Name) == false {
-		return nil, BadInput
-	}
-
 	uid := ctx.Value("uid")
 
-	ex, err2 := model.Categories(qm.Where("name=? and user_id=?", input.Name, uid.(string))).One(ctx, r.db)
-	if err2 != nil {
-		return nil, ErrNotFound
+	cat, err := model.Categories(qm.Where("categoryid=? and user_id=?", input.CategoryId, uid.(string))).One(ctx, r.db)
+	if err != nil {
+		fmt.Println(err)
 	}
 
-	fmt.Println(ex.Icon, ex.UserID)
+	id := ksuid.New()
 
-	if ex.Icon == input.Icon && ex.Name == input.Name && uid.(string) == ex.UserID {
-		id := ksuid.New()
-
+	if uid.(string) == cat.UserID || cat.Categoryid == "" {
 		inputex := &model.Expense{
-			UserID:      uid.(string),
 			ID:          id.String(),
-			Icon:        input.Icon,
-			Name:        input.Name,
+			UserID:      uid.(string),
+			Categoryid:  null.StringFrom(cat.Categoryid),
 			Amount:      input.Amount,
 			Note:        null.StringFrom(input.Note),
 			ExpenseDate: input.ExpenseDate,
@@ -102,8 +91,7 @@ func (r *servicedb) ListExpense(ctx context.Context, input *ListExpensesInput) (
 	for _, val := range allex {
 		allexarr = append(allexarr, &ExpenseOutput{
 			Id:          val.ID,
-			Name:        val.Name,
-			Icon:        val.Icon,
+			CategoryId:  val.Categoryid.String,
 			Amount:      val.Amount,
 			Note:        val.Note.String,
 			ExpenseData: val.ExpenseDate,
@@ -131,8 +119,7 @@ func (r *servicedb) GetExpense(ctx context.Context, input *GetExpenseInput) (*Ex
 
 	return &ExpenseOutput{
 		Id:          getex.ID,
-		Icon:        getex.Icon,
-		Name:        getex.Name,
+		CategoryId:  getex.Categoryid.String,
 		Amount:      getex.Amount,
 		Note:        getex.Note.String,
 		ExpenseData: getex.ExpenseDate,

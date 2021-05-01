@@ -2,7 +2,6 @@ package endpoint
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/go-kit/kit/endpoint"
 	"github.com/zappel/expense-server/internal/catalog"
@@ -12,7 +11,6 @@ func SignUp(siup catalog.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
 		input := request.(*catalog.SignUpInput)
 		add, err := siup.SignUp(ctx, input)
-		fmt.Println(input, "rr")
 
 		return add, err
 	}

@@ -48,7 +48,7 @@ func main() {
 		c.Post("/category/{id}", httptransport.UpdateCategory(svc).ServeHTTP)
 
 		//expenses
-		c.Post("/expense", httptransport.AddExpense(svc).ServeHTTP)
+		c.Post("/expenses", httptransport.AddExpense(svc).ServeHTTP)
 		c.Get("/expenses", httptransport.ListExpenses(svc).ServeHTTP)
 		c.Get("/expense/{id}", httptransport.GetExpense(svc).ServeHTTP)
 

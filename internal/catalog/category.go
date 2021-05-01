@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/segmentio/ksuid"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
@@ -17,9 +18,10 @@ type (
 	}
 
 	AddCategoryInput struct {
-		Userid string `json: "userid"`
-		Icon   string `json:"Icon"`
-		Name   string `json:"categoryName"`
+		Categoryid string `json:"categoryid"`
+		Userid     string `json: "userid"`
+		Icon       string `json:"Icon"`
+		Name       string `json:"categoryName"`
 	}
 
 	CategoryOutput struct {
@@ -69,11 +71,13 @@ func (r *servicedb) AddCategory(ctx context.Context, input *AddCategoryInput) (*
 		return nil, DataExistErr
 	}
 
-	c := &model.Category{
+	catid := ksuid.New()
 
-		UserID: uid.(string),
-		Name:   input.Name,
-		Icon:   input.Icon,
+	c := &model.Category{
+		Categoryid: catid.String(),
+		UserID:     uid.(string),
+		Name:       input.Name,
+		Icon:       input.Icon,
 	}
 
 	fmt.Println(uid.(string))
@@ -130,7 +134,6 @@ func (r *servicedb) UpdateCategory(ctx context.Context, input *UpdateCategoryInp
 	if input.Name == "" || input.Icon == "" || !checkInput(input.Name) {
 		return nil, BadInput
 	}
-	fmt.Println(checkInput(input.Name))
 
 	upca, err := model.FindCategory(ctx, r.db, input.Categoryid)
 	if err != nil {

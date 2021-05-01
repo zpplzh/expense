@@ -41,7 +41,6 @@ type (
 func (r *servicedb) SignUp(ctx context.Context, input *SignUpInput) (*SignUpOutput, error) {
 	if checkEmail(input.Email) == false || len(input.Password) < 7 {
 		return nil, BadInput
-
 	}
 
 	var h *Hash
@@ -58,6 +57,7 @@ func (r *servicedb) SignUp(ctx context.Context, input *SignUpInput) (*SignUpOutp
 
 	err := inputus.Insert(ctx, r.db, boil.Infer())
 	if err != nil {
+		fmt.Println(err)
 		return nil, ErrDuplicate
 	}
 

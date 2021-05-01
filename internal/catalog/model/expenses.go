@@ -25,13 +25,11 @@ import (
 // Expense is an object representing the database table.
 type Expense struct {
 	ID          string      `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Name        string      `boil:"name" json:"name" toml:"name" yaml:"name"`
-	Icon        string      `boil:"icon" json:"icon" toml:"icon" yaml:"icon"`
+	Categoryid  null.String `boil:"categoryid" json:"categoryid,omitempty" toml:"categoryid" yaml:"categoryid,omitempty"`
 	Amount      int         `boil:"amount" json:"amount" toml:"amount" yaml:"amount"`
 	Note        null.String `boil:"note" json:"note,omitempty" toml:"note" yaml:"note,omitempty"`
 	ExpenseDate time.Time   `boil:"expense_date" json:"expense_date" toml:"expense_date" yaml:"expense_date"`
 	UserID      string      `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
-	Sequence    int         `boil:"sequence" json:"sequence" toml:"sequence" yaml:"sequence"`
 	CreatedAt   null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
 	UpdatedAt   null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
 	DeletedAt   null.Time   `boil:"deleted_at" json:"deleted_at,omitempty" toml:"deleted_at" yaml:"deleted_at,omitempty"`
@@ -42,54 +40,27 @@ type Expense struct {
 
 var ExpenseColumns = struct {
 	ID          string
-	Name        string
-	Icon        string
+	Categoryid  string
 	Amount      string
 	Note        string
 	ExpenseDate string
 	UserID      string
-	Sequence    string
 	CreatedAt   string
 	UpdatedAt   string
 	DeletedAt   string
 }{
 	ID:          "id",
-	Name:        "name",
-	Icon:        "icon",
+	Categoryid:  "categoryid",
 	Amount:      "amount",
 	Note:        "note",
 	ExpenseDate: "expense_date",
 	UserID:      "user_id",
-	Sequence:    "sequence",
 	CreatedAt:   "created_at",
 	UpdatedAt:   "updated_at",
 	DeletedAt:   "deleted_at",
 }
 
 // Generated where
-
-type whereHelperint struct{ field string }
-
-func (w whereHelperint) EQ(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
-func (w whereHelperint) NEQ(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
-func (w whereHelperint) LT(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
-func (w whereHelperint) LTE(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
-func (w whereHelperint) GT(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
-func (w whereHelperint) GTE(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
-func (w whereHelperint) IN(slice []int) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
-}
-func (w whereHelperint) NIN(slice []int) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
-}
 
 type whereHelpernull_String struct{ field string }
 
@@ -112,6 +83,29 @@ func (w whereHelpernull_String) GT(x null.String) qm.QueryMod {
 }
 func (w whereHelpernull_String) GTE(x null.String) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+
+type whereHelperint struct{ field string }
+
+func (w whereHelperint) EQ(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelperint) NEQ(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
+func (w whereHelperint) LT(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelperint) LTE(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
+func (w whereHelperint) GT(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelperint) GTE(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
+func (w whereHelperint) IN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
+}
+func (w whereHelperint) NIN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
 }
 
 type whereHelpertime_Time struct{ field string }
@@ -137,25 +131,21 @@ func (w whereHelpertime_Time) GTE(x time.Time) qm.QueryMod {
 
 var ExpenseWhere = struct {
 	ID          whereHelperstring
-	Name        whereHelperstring
-	Icon        whereHelperstring
+	Categoryid  whereHelpernull_String
 	Amount      whereHelperint
 	Note        whereHelpernull_String
 	ExpenseDate whereHelpertime_Time
 	UserID      whereHelperstring
-	Sequence    whereHelperint
 	CreatedAt   whereHelpernull_Time
 	UpdatedAt   whereHelpernull_Time
 	DeletedAt   whereHelpernull_Time
 }{
 	ID:          whereHelperstring{field: "\"expenses\".\"id\""},
-	Name:        whereHelperstring{field: "\"expenses\".\"name\""},
-	Icon:        whereHelperstring{field: "\"expenses\".\"icon\""},
+	Categoryid:  whereHelpernull_String{field: "\"expenses\".\"categoryid\""},
 	Amount:      whereHelperint{field: "\"expenses\".\"amount\""},
 	Note:        whereHelpernull_String{field: "\"expenses\".\"note\""},
 	ExpenseDate: whereHelpertime_Time{field: "\"expenses\".\"expense_date\""},
 	UserID:      whereHelperstring{field: "\"expenses\".\"user_id\""},
-	Sequence:    whereHelperint{field: "\"expenses\".\"sequence\""},
 	CreatedAt:   whereHelpernull_Time{field: "\"expenses\".\"created_at\""},
 	UpdatedAt:   whereHelpernull_Time{field: "\"expenses\".\"updated_at\""},
 	DeletedAt:   whereHelpernull_Time{field: "\"expenses\".\"deleted_at\""},
@@ -178,9 +168,9 @@ func (*expenseR) NewStruct() *expenseR {
 type expenseL struct{}
 
 var (
-	expenseAllColumns            = []string{"id", "name", "icon", "amount", "note", "expense_date", "user_id", "sequence", "created_at", "updated_at", "deleted_at"}
-	expenseColumnsWithoutDefault = []string{"id", "name", "icon", "amount", "note", "expense_date", "user_id", "created_at", "updated_at", "deleted_at"}
-	expenseColumnsWithDefault    = []string{"sequence"}
+	expenseAllColumns            = []string{"id", "categoryid", "amount", "note", "expense_date", "user_id", "created_at", "updated_at", "deleted_at"}
+	expenseColumnsWithoutDefault = []string{"id", "categoryid", "amount", "note", "expense_date", "user_id", "created_at", "updated_at", "deleted_at"}
+	expenseColumnsWithDefault    = []string{}
 	expensePrimaryKeyColumns     = []string{"id"}
 )
 
