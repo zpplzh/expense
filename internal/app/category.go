@@ -1,14 +1,13 @@
-package catalog
+package app
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/segmentio/ksuid"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
-	"github.com/zappel/expense-server/internal/catalog/model"
+	"github.com/zappel/expense-server/internal/app/model"
 )
 
 type (
@@ -25,11 +24,16 @@ type (
 	}
 
 	CategoryOutput struct {
-		Icon string `json:"Icon"`
-		Name string `json: "CategoryName"`
+		Categoryid string `json: "categoryid"`
+		Icon       string `json:"Icon"`
+		Name       string `json: "CategoryName"`
 	}
 
 	DelCategoryInput struct {
+		Categoryid string `json: "categoryid"`
+	}
+
+	DelCategoryOutput struct {
 		Categoryid string `json: "categoryid"`
 	}
 
@@ -41,7 +45,9 @@ type (
 		Icon       string `json:"icon"`
 	}
 
-	UpdateCategoryOutput struct{}
+	UpdateCategoryOutput struct {
+		Categoryid string `json: "categoryid"`
+	}
 )
 
 func (r *servicedb) GetCategory(ctx context.Context, input *GetCategoryInput) (*CategoryOutput, error) {
@@ -53,8 +59,9 @@ func (r *servicedb) GetCategory(ctx context.Context, input *GetCategoryInput) (*
 	}
 
 	return &CategoryOutput{
-		Name: gcat.Name,
-		Icon: string(gcat.Icon),
+		Categoryid: gcat.Categoryid,
+		Name:       gcat.Name,
+		Icon:       string(gcat.Icon),
 	}, nil
 
 }
@@ -79,9 +86,6 @@ func (r *servicedb) AddCategory(ctx context.Context, input *AddCategoryInput) (*
 		Name:       input.Name,
 		Icon:       input.Icon,
 	}
-
-	fmt.Println(uid.(string))
-
 	err := c.Insert(ctx, r.db, boil.Infer())
 	if err != nil {
 
@@ -89,26 +93,29 @@ func (r *servicedb) AddCategory(ctx context.Context, input *AddCategoryInput) (*
 	}
 
 	return &CategoryOutput{
-		Name: input.Name,
-		Icon: input.Icon,
+		Categoryid: catid.String(),
+		Name:       input.Name,
+		Icon:       input.Icon,
 	}, nil
 }
 
-func (r *servicedb) DelCategory(ctx context.Context, input *DelCategoryInput) error {
+func (r *servicedb) DelCategory(ctx context.Context, input *DelCategoryInput) (*DelCategoryOutput, error) {
 	uid := ctx.Value(string("uid"))
 
 	exists, err1 := model.Categories(qm.Where("user_id=? AND categoryid=?", uid.(string), input.Categoryid)).Exists(ctx, r.db)
 	if err1 != nil || exists == false {
 
-		return ErrNotFound
+		return nil, ErrNotFound
 	}
 
 	_, err := model.Categories(qm.Where("categoryid = ? AND user_id=?", input.Categoryid, uid.(string))).DeleteAll(ctx, r.db, true)
 	if err != nil {
-		return ErrNotFound
+		return nil, ErrNotFound
 	}
 
-	return nil
+	return &DelCategoryOutput{
+		Categoryid: input.Categoryid,
+	}, nil
 
 }
 
@@ -146,6 +153,8 @@ func (r *servicedb) UpdateCategory(ctx context.Context, input *UpdateCategoryInp
 		return nil, ErrNotFound
 	}
 
-	return nil, nil
+	return &UpdateCategoryOutput{
+		Categoryid: input.Categoryid,
+	}, nil
 
 }

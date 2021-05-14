@@ -8,7 +8,7 @@ import (
 
 	"github.com/jmoiron/sqlx"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
-	"github.com/zappel/expense-server/internal/catalog/model"
+	"github.com/zappel/expense-server/internal/app/model"
 )
 
 var (

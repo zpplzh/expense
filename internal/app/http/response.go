@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/zappel/expense-server/internal/catalog"
+	"github.com/zappel/expense-server/internal/app"
 )
 
 type Errorer interface {
@@ -42,9 +42,9 @@ func encodeError(_ context.Context, err error, w http.ResponseWriter) {
 func codeFrom(err error) int {
 	switch err {
 
-	case catalog.ErrNotFound:
+	case app.ErrNotFound:
 		return http.StatusNotFound
-	case catalog.ErrDuplicate, catalog.DataExistErr:
+	case app.ErrDuplicate, app.DataExistErr:
 		return http.StatusConflict
 
 	default:

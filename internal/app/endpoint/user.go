@@ -4,30 +4,30 @@ import (
 	"context"
 
 	"github.com/go-kit/kit/endpoint"
-	"github.com/zappel/expense-server/internal/catalog"
+	"github.com/zappel/expense-server/internal/app"
 )
 
-func SignUp(siup catalog.Service) endpoint.Endpoint {
+func SignUp(siup app.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		input := request.(*catalog.SignUpInput)
+		input := request.(*app.SignUpInput)
 		add, err := siup.SignUp(ctx, input)
 
 		return add, err
 	}
 }
 
-func Login(logi catalog.Service) endpoint.Endpoint {
+func Login(logi app.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		input := request.(*catalog.LoginInput)
+		input := request.(*app.LoginInput)
 		ex, err := logi.Login(ctx, input)
 
 		return ex, err
 	}
 }
 
-func Logout(logou catalog.Service) endpoint.Endpoint {
+func Logout(logou app.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		input := request.(*catalog.Logoutinput)
+		input := request.(*app.Logoutinput)
 		val, err := logou.Logout(ctx, input)
 		if err != nil {
 			return nil, err

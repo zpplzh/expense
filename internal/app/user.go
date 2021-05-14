@@ -1,8 +1,7 @@
-package catalog
+package app
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"time"
 
@@ -11,7 +10,7 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
-	"github.com/zappel/expense-server/internal/catalog/model"
+	"github.com/zappel/expense-server/internal/app/model"
 )
 
 type (
@@ -88,7 +87,6 @@ func (r *servicedb) Login(ctx context.Context, input *LoginInput) (*LoginOutput,
 			break
 		} else {
 			count++
-			fmt.Println(count, tampsess)
 			if count == 5 {
 				break
 			}

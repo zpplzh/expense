@@ -1,4 +1,4 @@
-package catalog
+package app
 
 import (
 	"context"
@@ -18,14 +18,14 @@ var (
 type Service interface {
 	GetCategory(ctx context.Context, input *GetCategoryInput) (*CategoryOutput, error)
 	AddCategory(ctx context.Context, input *AddCategoryInput) (*CategoryOutput, error)
-	DelCategory(ctx context.Context, input *DelCategoryInput) error
+	DelCategory(ctx context.Context, input *DelCategoryInput) (*DelCategoryOutput, error)
 	UpdateCategory(ctx context.Context, input *UpdateCategoryInput) (*UpdateCategoryOutput, error)
 	ListCategories(ctx context.Context, input *ListCategoriesInput) ([]*CategoryOutput, error)
 
 	GetExpense(ctx context.Context, input *GetExpenseInput) (*ExpenseOutput, error)
 	AddExpense(ctx context.Context, input *AddExpenseInput) (*AddExpenseOutput, error)
 	ListExpense(ctx context.Context, input *ListExpensesInput) ([]*ExpenseOutput, error)
-	DelExpense(ctx context.Context, input *DelExpenseInput) error
+	DelExpense(ctx context.Context, input *DelExpenseInput) (*DelExpenseOutput, error)
 	UpdateExpense(ctx context.Context, input *UpdateExpenseInput) (*UpdateExpenseOutput, error)
 
 	SignUp(ctx context.Context, input *SignUpInput) (*SignUpOutput, error)

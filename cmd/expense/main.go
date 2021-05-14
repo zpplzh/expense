@@ -10,9 +10,9 @@ import (
 
 	_ "github.com/lib/pq"
 	configs "github.com/zappel/expense-server/cmd/expense/config"
-	"github.com/zappel/expense-server/internal/catalog"
-	httptransport "github.com/zappel/expense-server/internal/catalog/http"
-	"github.com/zappel/expense-server/internal/catalog/middleware"
+	"github.com/zappel/expense-server/internal/app"
+	httptransport "github.com/zappel/expense-server/internal/app/http"
+	"github.com/zappel/expense-server/internal/app/middleware"
 )
 
 func main() {
@@ -31,7 +31,7 @@ func main() {
 	}
 	defer db.Close()
 
-	svc := catalog.NewServices(db) //func
+	svc := app.NewServices(db) //func
 	svcm := middleware.NewServicess(db)
 
 	r := chi.NewRouter()
@@ -41,16 +41,16 @@ func main() {
 		c.Use(svcm.ValidateUser)
 
 		//category
-		c.Post("/category", httptransport.AddCategory(svc).ServeHTTP) // svc itu kirim receiver , addcategory(svc) return -> servehttp
-		c.Get("/category/{id}", httptransport.GetCategory(svc))
-		c.Delete("/category/{id}", httptransport.DelCategory(svc).ServeHTTP)
+		c.Post("/categories", httptransport.AddCategory(svc).ServeHTTP) // svc itu kirim receiver , addcategory(svc) return -> servehttp
+		c.Get("/categories/{id}", httptransport.GetCategory(svc))
+		c.Delete("/categories/{id}", httptransport.DelCategory(svc).ServeHTTP)
 		c.Get("/categories", httptransport.ListCategories(svc).ServeHTTP)
-		c.Post("/category/{id}", httptransport.UpdateCategory(svc).ServeHTTP)
+		c.Post("/categories/{id}", httptransport.UpdateCategory(svc).ServeHTTP)
 
 		//expenses
 		c.Post("/expenses", httptransport.AddExpense(svc).ServeHTTP)
 		c.Get("/expenses", httptransport.ListExpenses(svc).ServeHTTP)
-		c.Get("/expense/{id}", httptransport.GetExpense(svc).ServeHTTP)
+		c.Get("/expenses/{id}", httptransport.GetExpense(svc).ServeHTTP)
 		c.Delete("/expenses/{id}", httptransport.DelExpense(svc).ServeHTTP)
 		c.Post("/expenses/{id}", httptransport.UpdateExpense(svc).ServeHTTP)
 

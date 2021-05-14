@@ -19,12 +19,12 @@ go get github.com/volatiletech/sqlboiler/v4/drivers/sqlboiler-psql`
 4. To create table run this command
 * assume that postgres is run & setup with `user=postgres` & `password=password`, and database `expense` exists.
 
-`migrate -source file://internal/catalog/database/migrations -database "postgres://postgres:password@localhost:5432/expense?sslmode=disable" up`
+`migrate -source file://internal/app/database/migrations -database "postgres://postgres:password@localhost:5432/expense?sslmode=disable" up`
 
 tables will be created : expenses, users, category
 
 5. to create models run this command
-`(cd ./internal/catalog && sqlboiler --add-soft-deletes psql)`
+`(cd ./internal/app && sqlboiler --add-soft-deletes psql)`
 
 6. to run application export following environment value\
 `export PORT = :[port]`  

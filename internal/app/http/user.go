@@ -6,18 +6,18 @@ import (
 	"net/http"
 
 	httptransport "github.com/go-kit/kit/transport/http"
-	"github.com/zappel/expense-server/internal/catalog"
-	"github.com/zappel/expense-server/internal/catalog/endpoint"
+	"github.com/zappel/expense-server/internal/app"
+	"github.com/zappel/expense-server/internal/app/endpoint"
 )
 
-func SignUp(sgnup catalog.Service) http.Handler {
+func SignUp(sgnup app.Service) http.Handler {
 	return httptransport.NewServer(
 		//endpoint
 		endpoint.SignUp(sgnup),
 
 		//decoder
 		func(_ context.Context, r *http.Request) (interface{}, error) {
-			var inp catalog.SignUpInput
+			var inp app.SignUpInput
 
 			if err := json.NewDecoder(r.Body).Decode(&inp); err != nil {
 
@@ -31,14 +31,14 @@ func SignUp(sgnup catalog.Service) http.Handler {
 	)
 }
 
-func Login(logi catalog.Service) http.Handler {
+func Login(logi app.Service) http.Handler {
 	return httptransport.NewServer(
 		//endpoint
 		endpoint.Login(logi),
 
 		//decoder
 		func(_ context.Context, r *http.Request) (interface{}, error) {
-			var inp catalog.LoginInput
+			var inp app.LoginInput
 
 			if err := json.NewDecoder(r.Body).Decode(&inp); err != nil {
 
@@ -52,7 +52,7 @@ func Login(logi catalog.Service) http.Handler {
 	)
 }
 
-func Logout(logo catalog.Service) http.Handler {
+func Logout(logo app.Service) http.Handler {
 	return httptransport.NewServer(
 		//endpoint
 		endpoint.Logout(logo),
@@ -60,7 +60,7 @@ func Logout(logo catalog.Service) http.Handler {
 		//decoder
 		func(_ context.Context, r *http.Request) (interface{}, error) {
 			ro := r.Header.Get("sessionid")
-			inp := catalog.Logoutinput{
+			inp := app.Logoutinput{
 				Sessionid: ro,
 			}
 

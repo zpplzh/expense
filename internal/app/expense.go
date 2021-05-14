@@ -1,8 +1,7 @@
-package catalog
+package app
 
 import (
 	"context"
-	"fmt"
 	"time"
 
 	"github.com/segmentio/ksuid"
@@ -10,7 +9,7 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
-	"github.com/zappel/expense-server/internal/catalog/model"
+	"github.com/zappel/expense-server/internal/app/model"
 )
 
 type (
@@ -19,14 +18,17 @@ type (
 	}
 
 	AddExpenseInput struct {
-		UserID      string    `json: "userid"`
-		CategoryId  string    `json: "categoryod"`
+		UserID     string  `json: "userid"`
+		CategoryId *string `json: "categoryid"`
+		//harus pake pointer kalau ga pake pointer pas isi nya null di request jadi error, string yang isi nya "" itu tetap di anggap ada isi
 		Amount      int       `json:"amount"`
 		Note        string    `json:"note"`
 		ExpenseDate time.Time `json:"expensedate"`
 	}
 
-	AddExpenseOutput struct{}
+	AddExpenseOutput struct {
+		Id string `json: "id"`
+	}
 
 	ExpenseOutput struct {
 		Id          string    `json: "id"`
@@ -41,6 +43,9 @@ type (
 	DelExpenseInput struct {
 		Id string `json:"id"`
 	}
+	DelExpenseOutput struct {
+		Id string `json:"id"`
+	}
 
 	UpdateExpenseInput struct {
 		Id          string    `json:"id"`
@@ -50,40 +55,49 @@ type (
 		ExpenseDate time.Time `json: "expenseDate"`
 	}
 
-	UpdateExpenseOutput struct{}
+	UpdateExpenseOutput struct {
+		Id string `json: "id"`
+	}
+
+	BatchAddExpenseInput struct {
+		data []*AddExpenseInput
+	}
 )
 
 func (r *servicedb) AddExpense(ctx context.Context, input *AddExpenseInput) (*AddExpenseOutput, error) {
 
 	uid := ctx.Value("uid")
 
-	cat, err := model.Categories(qm.Where("categoryid=? and user_id=?", input.CategoryId, uid.(string))).One(ctx, r.db)
-	if err != nil {
-		fmt.Println(err)
-	}
-
 	id := ksuid.New()
 
-	if uid.(string) == cat.UserID || cat.Categoryid == "" {
-		inputex := &model.Expense{
-			ID:          id.String(),
-			UserID:      uid.(string),
-			Categoryid:  null.StringFrom(cat.Categoryid),
-			Amount:      input.Amount,
-			Note:        null.StringFrom(input.Note),
-			ExpenseDate: input.ExpenseDate,
-		}
-
-		err := inputex.Insert(ctx, r.db, boil.Infer())
-		if err != nil {
-
-			return nil, ErrDuplicate
-		}
-	} else {
-		return nil, ErrNotFound
+	inputex := &model.Expense{
+		ID:     id.String(),
+		UserID: uid.(string),
+		// Categoryid:  null.StringFrom(cat.Categoryid),
+		Amount:      input.Amount,
+		Note:        null.StringFrom(input.Note),
+		ExpenseDate: input.ExpenseDate,
 	}
 
-	return nil, nil
+	if input.CategoryId != nil {
+		cat, err := model.Categories(qm.Where("categoryid=? and user_id=?", input.CategoryId, uid.(string))).One(ctx, r.db)
+		if err != nil {
+			return nil, ErrNotFound
+		}
+		if uid == cat.UserID {
+			inputex.Categoryid = null.StringFrom(cat.Categoryid)
+		}
+	}
+
+	err := inputex.Insert(ctx, r.db, boil.Infer())
+	if err != nil {
+
+		return nil, ErrDuplicate
+	}
+
+	return &AddExpenseOutput{
+		Id: id.String(),
+	}, nil
 }
 
 func (r *servicedb) ListExpense(ctx context.Context, input *ListExpensesInput) ([]*ExpenseOutput, error) {
@@ -107,13 +121,15 @@ func (r *servicedb) ListExpense(ctx context.Context, input *ListExpensesInput) (
 	return allexarr, nil
 }
 
-func (r *servicedb) DelExpense(ctx context.Context, input *DelExpenseInput) error {
+func (r *servicedb) DelExpense(ctx context.Context, input *DelExpenseInput) (*DelExpenseOutput, error) {
 	uid := ctx.Value(string("uid"))
 	_, err := model.Expenses(qm.Where("Id = ? AND user_id=?", input.Id, uid.(string))).DeleteAll(ctx, r.db, true)
 	if err != nil {
-		return ErrNotFound
+		return nil, ErrNotFound
 	}
-	return nil
+	return &DelExpenseOutput{
+		Id: input.Id,
+	}, nil
 }
 
 func (r *servicedb) GetExpense(ctx context.Context, input *GetExpenseInput) (*ExpenseOutput, error) {
@@ -150,6 +166,8 @@ func (r *servicedb) UpdateExpense(ctx context.Context, input *UpdateExpenseInput
 		return nil, ErrNotFound
 	}
 
-	return nil, nil
+	return &UpdateExpenseOutput{
+		Id: input.Id,
+	}, nil
 
 }

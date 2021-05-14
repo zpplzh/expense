@@ -2,25 +2,24 @@ package endpoint
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/go-kit/kit/endpoint"
-	"github.com/zappel/expense-server/internal/catalog"
+	"github.com/zappel/expense-server/internal/app"
 )
 
-func AddExpense(addex catalog.Service) endpoint.Endpoint {
+func AddExpense(addex app.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		input := request.(*catalog.AddExpenseInput)
-		_, err := addex.AddExpense(ctx, input)
+		input := request.(*app.AddExpenseInput)
+		add, err := addex.AddExpense(ctx, input)
 
-		return nil, err
+		return add, err
 	}
 }
 
-func ListExpenses(showallex catalog.Service) endpoint.Endpoint {
+func ListExpenses(showallex app.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		var input *catalog.ListExpensesInput
-		var expenses []*catalog.ExpenseOutput
+		var input *app.ListExpensesInput
+		var expenses []*app.ExpenseOutput
 
 		expenses, err := showallex.ListExpense(ctx, input)
 
@@ -28,30 +27,29 @@ func ListExpenses(showallex catalog.Service) endpoint.Endpoint {
 	}
 }
 
-func GetExpense(getex catalog.Service) endpoint.Endpoint {
+func GetExpense(getex app.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		qry := request.(*catalog.GetExpenseInput)
+		qry := request.(*app.GetExpenseInput)
 		viewex, err := getex.GetExpense(ctx, qry)
-		fmt.Println(viewex)
 		return viewex, err
 	}
 }
 
-func DelExpense(delex catalog.Service) endpoint.Endpoint {
+func DelExpense(delex app.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		input := request.(*catalog.DelExpenseInput)
-		err := delex.DelExpense(ctx, input)
+		input := request.(*app.DelExpenseInput)
+		del, err := delex.DelExpense(ctx, input)
 		if err != nil {
 			return nil, err
 		}
 
-		return nil, nil
+		return del, nil
 	}
 }
 
-func UpdateExpense(upex catalog.Service) endpoint.Endpoint {
+func UpdateExpense(upex app.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		input := request.(*catalog.UpdateExpenseInput)
+		input := request.(*app.UpdateExpenseInput)
 		upc, err := upex.UpdateExpense(ctx, input)
 		if err != nil {
 			return nil, err

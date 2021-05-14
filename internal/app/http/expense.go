@@ -7,63 +7,80 @@ import (
 
 	"github.com/go-chi/chi"
 	httptransport "github.com/go-kit/kit/transport/http"
-	"github.com/zappel/expense-server/internal/catalog"
-	"github.com/zappel/expense-server/internal/catalog/endpoint"
+	"github.com/zappel/expense-server/internal/app"
+	"github.com/zappel/expense-server/internal/app/endpoint"
 )
 
-func GetCategory(Getcat catalog.Service) http.HandlerFunc { //interface getcat addcat
-
+func AddExpense(addex app.Service) http.Handler { //interface getcat addcat
+	// Endpoint.
 	return httptransport.NewServer(
 		//endpoint
-		endpoint.GetCategory(Getcat),
+		endpoint.AddExpense(addex),
 
 		// Decoder.
 		func(_ context.Context, r *http.Request) (interface{}, error) {
-			var qry catalog.GetCategoryInput
-			qry.Name = chi.URLParam(r, "id")
-			return &qry, nil
-		},
-
-		// Encoder.
-		encodeResponse,
-
-		httptransport.ServerErrorEncoder(encodeError),
-	).ServeHTTP
-}
-
-func AddCategory(Addcat catalog.Service) http.Handler {
-	//catalog.Service itu function nya tapi dia terima receiver svc yang di main karna di catalog minta receiver
-
-	return httptransport.NewServer(
-		// Endpoint.
-		endpoint.AddCategory(Addcat),
-
-		// Decoder.
-		func(_ context.Context, r *http.Request) (interface{}, error) {
-			var input catalog.AddCategoryInput
+			var input app.AddExpenseInput
 			if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 
 			}
+
 			return &input, nil
 		},
 
 		// Encoder.
 		encodeResponse,
-
 		httptransport.ServerErrorEncoder(encodeError),
 	)
 }
 
-func DelCategory(Delcat catalog.Service) http.Handler { //interface getcat addcat
+func ListExpenses(showallex app.Service) http.Handler { //interface getcat addcat
 	// Endpoint.
 	return httptransport.NewServer(
 		//endpoint
-		endpoint.DelCategory(Delcat),
+		endpoint.ListExpenses(showallex),
 
 		// Decoder.
 		func(_ context.Context, r *http.Request) (interface{}, error) {
-			var qry catalog.DelCategoryInput
-			qry.Categoryid = chi.URLParam(r, "id")
+			var qry app.ListExpensesInput
+
+			return &qry, nil
+		},
+
+		// Encoder.
+		encodeResponse,
+		httptransport.ServerErrorEncoder(encodeError),
+	)
+}
+
+func GetExpense(getex app.Service) http.Handler { //interface getcat addcat
+
+	return httptransport.NewServer(
+		//endpoint
+		endpoint.GetExpense(getex),
+
+		// Decoder.
+		func(_ context.Context, r *http.Request) (interface{}, error) {
+			var qry app.GetExpenseInput
+			qry.Id = chi.URLParam(r, "id")
+			return &qry, nil
+		},
+
+		// Encoder.
+		encodeResponse,
+		httptransport.ServerErrorEncoder(encodeError),
+	)
+}
+
+func DelExpense(Delex app.Service) http.Handler { //interface getcat addcat
+	// Endpoint.
+	return httptransport.NewServer(
+		//endpoint
+		endpoint.DelExpense(Delex),
+
+		// Decoder.
+		func(_ context.Context, r *http.Request) (interface{}, error) {
+			var qry app.DelExpenseInput
+			qry.Id = chi.URLParam(r, "id")
 			return &qry, nil
 		},
 
@@ -74,36 +91,16 @@ func DelCategory(Delcat catalog.Service) http.Handler { //interface getcat addca
 	)
 }
 
-func ListCategories(showallcat catalog.Service) http.Handler { //interface getcat addcat
-	// Endpoint.
-	return httptransport.NewServer(
-		//endpoint
-		endpoint.ListCategories(showallcat),
-
-		// Decoder.
-		func(_ context.Context, r *http.Request) (interface{}, error) {
-			var qry catalog.ListCategoriesInput
-
-			return &qry, nil
-		},
-
-		// Encoder.
-		encodeResponse,
-
-		httptransport.ServerErrorEncoder(encodeError),
-	)
-}
-
-func UpdateCategory(upcat catalog.Service) http.Handler {
-	//catalog.Service itu function nya tapi dia terima receiver svc yang di main karna di catalog minta receiver
+func UpdateExpense(upex app.Service) http.Handler {
+	//app.Service itu function nya tapi dia terima receiver svc yang di main karna di app minta receiver
 	return httptransport.NewServer(
 		// Endpoint.
-		endpoint.UpdateCategory(upcat),
+		endpoint.UpdateExpense(upex),
 
 		// Decoder.
 		func(_ context.Context, r *http.Request) (interface{}, error) {
-			var input catalog.UpdateCategoryInput
-			input.Categoryid = chi.URLParam(r, "id")
+			var input app.UpdateExpenseInput
+			input.Id = chi.URLParam(r, "id")
 			if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 
 			}

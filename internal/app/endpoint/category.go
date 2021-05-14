@@ -4,12 +4,12 @@ import (
 	"context"
 
 	"github.com/go-kit/kit/endpoint"
-	"github.com/zappel/expense-server/internal/catalog"
+	"github.com/zappel/expense-server/internal/app"
 )
 
-func GetCategory(getcat catalog.Service) endpoint.Endpoint {
+func GetCategory(getcat app.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		qry := request.(*catalog.GetCategoryInput)
+		qry := request.(*app.GetCategoryInput)
 		viewcat, err := getcat.GetCategory(ctx, qry)
 		if err != nil {
 			return nil, err
@@ -18,9 +18,9 @@ func GetCategory(getcat catalog.Service) endpoint.Endpoint {
 	}
 }
 
-func AddCategory(addcat catalog.Service) endpoint.Endpoint {
+func AddCategory(addcat app.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		input := request.(*catalog.AddCategoryInput)
+		input := request.(*app.AddCategoryInput)
 		add, err := addcat.AddCategory(ctx, input)
 		if err != nil {
 			return nil, err
@@ -29,22 +29,22 @@ func AddCategory(addcat catalog.Service) endpoint.Endpoint {
 	}
 }
 
-func DelCategory(delcat catalog.Service) endpoint.Endpoint {
+func DelCategory(delcat app.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		input := request.(*catalog.DelCategoryInput)
-		err := delcat.DelCategory(ctx, input)
+		input := request.(*app.DelCategoryInput)
+		del, err := delcat.DelCategory(ctx, input)
 		if err != nil {
 			return nil, err
 		}
 
-		return nil, nil
+		return del, nil
 	}
 }
 
-func ListCategories(showallcat catalog.Service) endpoint.Endpoint {
+func ListCategories(showallcat app.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		var input *catalog.ListCategoriesInput
-		var categories []*catalog.CategoryOutput
+		var input *app.ListCategoriesInput
+		var categories []*app.CategoryOutput
 
 		categories, err := showallcat.ListCategories(ctx, input)
 		if err != nil {
@@ -55,9 +55,9 @@ func ListCategories(showallcat catalog.Service) endpoint.Endpoint {
 	}
 }
 
-func UpdateCategory(upcat catalog.Service) endpoint.Endpoint {
+func UpdateCategory(upcat app.Service) endpoint.Endpoint {
 	return func(ctx context.Context, request interface{}) (interface{}, error) {
-		input := request.(*catalog.UpdateCategoryInput)
+		input := request.(*app.UpdateCategoryInput)
 		upc, err := upcat.UpdateCategory(ctx, input)
 		if err != nil {
 			return nil, err
