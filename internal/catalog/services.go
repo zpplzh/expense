@@ -12,7 +12,7 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 
 	"github.com/zappel/expense-server/internal/catalog/model"
-	"github.com/zappel/expense-server/internal/catalog/pkgs"
+	pkgs "github.com/zappel/expense-server/internal/catalog/pkg"
 )
 
 type (
