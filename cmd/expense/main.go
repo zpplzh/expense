@@ -1,34 +1,29 @@
 package main
 
 import (
-	"context"
 	"log"
 	"net/http"
 
 	"github.com/go-chi/chi"
 	"github.com/jmoiron/sqlx"
-	"github.com/sethvargo/go-envconfig"
+	"github.com/unrolled/secure"
 
 	_ "github.com/lib/pq"
-	"github.com/zappel/expense-server/internal/catalog"
-	httptransport "github.com/zappel/expense-server/internal/catalog/http"
+	configs "github.com/zappel/expense-server/cmd/expense/config"
+	"github.com/zappel/expense-server/internal/app"
+	httptransport "github.com/zappel/expense-server/internal/app/http"
+	"github.com/zappel/expense-server/internal/app/middleware"
 )
-
-type MyConfig struct {
-	PortServer string `env:"PORT"`
-	DBName     string `env:"DBNAME"`
-	DBUsername string `env:"DBUSER"`
-	DBPass     string `env:"DBPASS"`
-}
 
 func main() {
 
-	var conf MyConfig
-	ctx := context.Background()
+	secureMiddleware := secure.New(secure.Options{
+		FrameDeny:               true,
+		CustomFrameOptionsValue: "SAMEORIGIN",
+		ContentTypeNosniff:      true,
+	})
 
-	if err := envconfig.Process(ctx, &conf); err != nil {
-		log.Fatal(err)
-	}
+	conf := configs.GetEnv()
 
 	db, err := sqlx.Open("postgres", "dbname="+conf.DBName+" user="+conf.DBUsername+" password="+conf.DBPass+" sslmode=disable")
 	if err != nil {
@@ -36,23 +31,41 @@ func main() {
 	}
 	defer db.Close()
 
-	svc := catalog.NewServices(db) //func
+	svc := app.NewServices(db) //func
+	svcm := middleware.NewServicess(db)
 
 	r := chi.NewRouter()
-	
-	//category
-	r.Post("/addcategory", httptransport.AddCategory(svc).ServeHTTP) // svc itu kirim receiver , addcategory(svc) return -> servehttp
-	r.Get("/getcategory/{category}", httptransport.GetCategory(svc))
-	r.Post("/deletecategory/{category}", httptransport.DelCategory(svc).ServeHTTP)
-	r.Get("/listcategories", httptransport.ListCategories(svc).ServeHTTP)
+	r.Use(secureMiddleware.Handler)
 
-	//expenses
-	r.Post("/addexpense", httptransport.AddExpense(svc).ServeHTTP)
-	r.Get("/listexpenses", httptransport.ListExpenses(svc).ServeHTTP)
-	r.Get("/getexpense/{expense}", httptransport.GetExpense(svc).ServeHTTP)
+	r.Group(func(c chi.Router) {
+		c.Use(svcm.ValidateUser)
+
+		//category
+		c.Post("/categories", httptransport.AddCategory(svc).ServeHTTP) // svc itu kirim receiver , addcategory(svc) return -> servehttp
+		c.Get("/categories/{id}", httptransport.GetCategory(svc))
+		c.Delete("/categories/{id}", httptransport.DelCategory(svc).ServeHTTP)
+		c.Get("/categories", httptransport.ListCategories(svc).ServeHTTP)
+		c.Post("/categories/{id}", httptransport.UpdateCategory(svc).ServeHTTP)
+
+		//expenses
+		c.Post("/expenses", httptransport.AddExpense(svc).ServeHTTP)
+		c.Get("/expenses", httptransport.ListExpenses(svc).ServeHTTP)
+		c.Get("/expenses/{id}", httptransport.GetExpense(svc).ServeHTTP)
+		c.Delete("/expenses/{id}", httptransport.DelExpense(svc).ServeHTTP)
+		c.Post("/expenses/{id}", httptransport.UpdateExpense(svc).ServeHTTP)
+		c.Post("/batch/expenses", httptransport.AddExpenseBatch(svc).ServeHTTP)
+
+		//user
+		c.Post("/logout", httptransport.Logout(svc).ServeHTTP)
+
+	})
 
 	//user
-	r.Post("/signup", httptransport.SignUp(svc).ServeHTTP)
+	r.Group(func(d chi.Router) {
+		d.Post("/signup", httptransport.SignUp(svc).ServeHTTP)
+		d.Post("/login", httptransport.Login(svc).ServeHTTP)
+
+	})
 
 	log.Println("Listening on ", conf.PortServer, "...")
 	http.ListenAndServe(conf.PortServer, r)

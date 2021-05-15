@@ -25,13 +25,11 @@ import (
 // Expense is an object representing the database table.
 type Expense struct {
 	ID          string      `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Name        string      `boil:"name" json:"name" toml:"name" yaml:"name"`
-	Icon        string      `boil:"icon" json:"icon" toml:"icon" yaml:"icon"`
+	Categoryid  null.String `boil:"categoryid" json:"categoryid,omitempty" toml:"categoryid" yaml:"categoryid,omitempty"`
 	Amount      int         `boil:"amount" json:"amount" toml:"amount" yaml:"amount"`
 	Note        null.String `boil:"note" json:"note,omitempty" toml:"note" yaml:"note,omitempty"`
 	ExpenseDate time.Time   `boil:"expense_date" json:"expense_date" toml:"expense_date" yaml:"expense_date"`
 	UserID      string      `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
-	Sequence    int         `boil:"sequence" json:"sequence" toml:"sequence" yaml:"sequence"`
 	CreatedAt   null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
 	UpdatedAt   null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
 	DeletedAt   null.Time   `boil:"deleted_at" json:"deleted_at,omitempty" toml:"deleted_at" yaml:"deleted_at,omitempty"`
@@ -42,54 +40,27 @@ type Expense struct {
 
 var ExpenseColumns = struct {
 	ID          string
-	Name        string
-	Icon        string
+	Categoryid  string
 	Amount      string
 	Note        string
 	ExpenseDate string
 	UserID      string
-	Sequence    string
 	CreatedAt   string
 	UpdatedAt   string
 	DeletedAt   string
 }{
 	ID:          "id",
-	Name:        "name",
-	Icon:        "icon",
+	Categoryid:  "categoryid",
 	Amount:      "amount",
 	Note:        "note",
 	ExpenseDate: "expense_date",
 	UserID:      "user_id",
-	Sequence:    "sequence",
 	CreatedAt:   "created_at",
 	UpdatedAt:   "updated_at",
 	DeletedAt:   "deleted_at",
 }
 
 // Generated where
-
-type whereHelperint struct{ field string }
-
-func (w whereHelperint) EQ(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
-func (w whereHelperint) NEQ(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
-func (w whereHelperint) LT(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
-func (w whereHelperint) LTE(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
-func (w whereHelperint) GT(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
-func (w whereHelperint) GTE(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
-func (w whereHelperint) IN(slice []int) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
-}
-func (w whereHelperint) NIN(slice []int) qm.QueryMod {
-	values := make([]interface{}, 0, len(slice))
-	for _, value := range slice {
-		values = append(values, value)
-	}
-	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
-}
 
 type whereHelpernull_String struct{ field string }
 
@@ -112,6 +83,29 @@ func (w whereHelpernull_String) GT(x null.String) qm.QueryMod {
 }
 func (w whereHelpernull_String) GTE(x null.String) qm.QueryMod {
 	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
+
+type whereHelperint struct{ field string }
+
+func (w whereHelperint) EQ(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelperint) NEQ(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
+func (w whereHelperint) LT(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelperint) LTE(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
+func (w whereHelperint) GT(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelperint) GTE(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
+func (w whereHelperint) IN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
+}
+func (w whereHelperint) NIN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereNotIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
 }
 
 type whereHelpertime_Time struct{ field string }
@@ -137,25 +131,21 @@ func (w whereHelpertime_Time) GTE(x time.Time) qm.QueryMod {
 
 var ExpenseWhere = struct {
 	ID          whereHelperstring
-	Name        whereHelperstring
-	Icon        whereHelperstring
+	Categoryid  whereHelpernull_String
 	Amount      whereHelperint
 	Note        whereHelpernull_String
 	ExpenseDate whereHelpertime_Time
 	UserID      whereHelperstring
-	Sequence    whereHelperint
 	CreatedAt   whereHelpernull_Time
 	UpdatedAt   whereHelpernull_Time
 	DeletedAt   whereHelpernull_Time
 }{
 	ID:          whereHelperstring{field: "\"expenses\".\"id\""},
-	Name:        whereHelperstring{field: "\"expenses\".\"name\""},
-	Icon:        whereHelperstring{field: "\"expenses\".\"icon\""},
+	Categoryid:  whereHelpernull_String{field: "\"expenses\".\"categoryid\""},
 	Amount:      whereHelperint{field: "\"expenses\".\"amount\""},
 	Note:        whereHelpernull_String{field: "\"expenses\".\"note\""},
 	ExpenseDate: whereHelpertime_Time{field: "\"expenses\".\"expense_date\""},
 	UserID:      whereHelperstring{field: "\"expenses\".\"user_id\""},
-	Sequence:    whereHelperint{field: "\"expenses\".\"sequence\""},
 	CreatedAt:   whereHelpernull_Time{field: "\"expenses\".\"created_at\""},
 	UpdatedAt:   whereHelpernull_Time{field: "\"expenses\".\"updated_at\""},
 	DeletedAt:   whereHelpernull_Time{field: "\"expenses\".\"deleted_at\""},
@@ -163,10 +153,14 @@ var ExpenseWhere = struct {
 
 // ExpenseRels is where relationship names are stored.
 var ExpenseRels = struct {
-}{}
+	CategoryidCategory string
+}{
+	CategoryidCategory: "CategoryidCategory",
+}
 
 // expenseR is where relationships are stored.
 type expenseR struct {
+	CategoryidCategory *Category `boil:"CategoryidCategory" json:"CategoryidCategory" toml:"CategoryidCategory" yaml:"CategoryidCategory"`
 }
 
 // NewStruct creates a new relationship struct
@@ -178,9 +172,9 @@ func (*expenseR) NewStruct() *expenseR {
 type expenseL struct{}
 
 var (
-	expenseAllColumns            = []string{"id", "name", "icon", "amount", "note", "expense_date", "user_id", "sequence", "created_at", "updated_at", "deleted_at"}
-	expenseColumnsWithoutDefault = []string{"id", "name", "icon", "amount", "note", "expense_date", "user_id", "created_at", "updated_at", "deleted_at"}
-	expenseColumnsWithDefault    = []string{"sequence"}
+	expenseAllColumns            = []string{"id", "categoryid", "amount", "note", "expense_date", "user_id", "created_at", "updated_at", "deleted_at"}
+	expenseColumnsWithoutDefault = []string{"id", "categoryid", "amount", "note", "expense_date", "user_id", "created_at", "updated_at", "deleted_at"}
+	expenseColumnsWithDefault    = []string{}
 	expensePrimaryKeyColumns     = []string{"id"}
 )
 
@@ -457,6 +451,210 @@ func (q expenseQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bo
 	}
 
 	return count > 0, nil
+}
+
+// CategoryidCategory pointed to by the foreign key.
+func (o *Expense) CategoryidCategory(mods ...qm.QueryMod) categoryQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("\"categoryid\" = ?", o.Categoryid),
+		qmhelper.WhereIsNull("deleted_at"),
+	}
+
+	queryMods = append(queryMods, mods...)
+
+	query := Categories(queryMods...)
+	queries.SetFrom(query.Query, "\"category\"")
+
+	return query
+}
+
+// LoadCategoryidCategory allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for an N-1 relationship.
+func (expenseL) LoadCategoryidCategory(ctx context.Context, e boil.ContextExecutor, singular bool, maybeExpense interface{}, mods queries.Applicator) error {
+	var slice []*Expense
+	var object *Expense
+
+	if singular {
+		object = maybeExpense.(*Expense)
+	} else {
+		slice = *maybeExpense.(*[]*Expense)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &expenseR{}
+		}
+		if !queries.IsNil(object.Categoryid) {
+			args = append(args, object.Categoryid)
+		}
+
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &expenseR{}
+			}
+
+			for _, a := range args {
+				if queries.Equal(a, obj.Categoryid) {
+					continue Outer
+				}
+			}
+
+			if !queries.IsNil(obj.Categoryid) {
+				args = append(args, obj.Categoryid)
+			}
+
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.From(`category`),
+		qm.WhereIn(`category.categoryid in ?`, args...),
+		qmhelper.WhereIsNull(`category.deleted_at`),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load Category")
+	}
+
+	var resultSlice []*Category
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice Category")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results of eager load for category")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for category")
+	}
+
+	if len(expenseAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(resultSlice) == 0 {
+		return nil
+	}
+
+	if singular {
+		foreign := resultSlice[0]
+		object.R.CategoryidCategory = foreign
+		if foreign.R == nil {
+			foreign.R = &categoryR{}
+		}
+		foreign.R.CategoryidExpenses = append(foreign.R.CategoryidExpenses, object)
+		return nil
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
+			if queries.Equal(local.Categoryid, foreign.Categoryid) {
+				local.R.CategoryidCategory = foreign
+				if foreign.R == nil {
+					foreign.R = &categoryR{}
+				}
+				foreign.R.CategoryidExpenses = append(foreign.R.CategoryidExpenses, local)
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// SetCategoryidCategory of the expense to the related item.
+// Sets o.R.CategoryidCategory to related.
+// Adds o to related.R.CategoryidExpenses.
+func (o *Expense) SetCategoryidCategory(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Category) error {
+	var err error
+	if insert {
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	}
+
+	updateQuery := fmt.Sprintf(
+		"UPDATE \"expenses\" SET %s WHERE %s",
+		strmangle.SetParamNames("\"", "\"", 1, []string{"categoryid"}),
+		strmangle.WhereClause("\"", "\"", 2, expensePrimaryKeyColumns),
+	)
+	values := []interface{}{related.Categoryid, o.ID}
+
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, updateQuery)
+		fmt.Fprintln(writer, values)
+	}
+	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	queries.Assign(&o.Categoryid, related.Categoryid)
+	if o.R == nil {
+		o.R = &expenseR{
+			CategoryidCategory: related,
+		}
+	} else {
+		o.R.CategoryidCategory = related
+	}
+
+	if related.R == nil {
+		related.R = &categoryR{
+			CategoryidExpenses: ExpenseSlice{o},
+		}
+	} else {
+		related.R.CategoryidExpenses = append(related.R.CategoryidExpenses, o)
+	}
+
+	return nil
+}
+
+// RemoveCategoryidCategory relationship.
+// Sets o.R.CategoryidCategory to nil.
+// Removes o from all passed in related items' relationships struct (Optional).
+func (o *Expense) RemoveCategoryidCategory(ctx context.Context, exec boil.ContextExecutor, related *Category) error {
+	var err error
+
+	queries.SetScanner(&o.Categoryid, nil)
+	if _, err = o.Update(ctx, exec, boil.Whitelist("categoryid")); err != nil {
+		return errors.Wrap(err, "failed to update local table")
+	}
+
+	if o.R != nil {
+		o.R.CategoryidCategory = nil
+	}
+	if related == nil || related.R == nil {
+		return nil
+	}
+
+	for i, ri := range related.R.CategoryidExpenses {
+		if queries.Equal(o.Categoryid, ri.Categoryid) {
+			continue
+		}
+
+		ln := len(related.R.CategoryidExpenses)
+		if ln > 1 && i < ln-1 {
+			related.R.CategoryidExpenses[i] = related.R.CategoryidExpenses[ln-1]
+		}
+		related.R.CategoryidExpenses = related.R.CategoryidExpenses[:ln-1]
+		break
+	}
+	return nil
 }
 
 // Expenses retrieves all the records using an executor.

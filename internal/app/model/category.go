@@ -24,31 +24,34 @@ import (
 
 // Category is an object representing the database table.
 type Category struct {
-	Name      string    `boil:"name" json:"name" toml:"name" yaml:"name"`
-	Icon      string    `boil:"icon" json:"icon" toml:"icon" yaml:"icon"`
-	UserID    string    `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
-	CreatedAt null.Time `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
-	UpdatedAt null.Time `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
-	DeletedAt null.Time `boil:"deleted_at" json:"deleted_at,omitempty" toml:"deleted_at" yaml:"deleted_at,omitempty"`
+	Categoryid string    `boil:"categoryid" json:"categoryid" toml:"categoryid" yaml:"categoryid"`
+	Name       string    `boil:"name" json:"name" toml:"name" yaml:"name"`
+	Icon       string    `boil:"icon" json:"icon" toml:"icon" yaml:"icon"`
+	UserID     string    `boil:"user_id" json:"user_id" toml:"user_id" yaml:"user_id"`
+	CreatedAt  null.Time `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
+	UpdatedAt  null.Time `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
+	DeletedAt  null.Time `boil:"deleted_at" json:"deleted_at,omitempty" toml:"deleted_at" yaml:"deleted_at,omitempty"`
 
 	R *categoryR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L categoryL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var CategoryColumns = struct {
-	Name      string
-	Icon      string
-	UserID    string
-	CreatedAt string
-	UpdatedAt string
-	DeletedAt string
+	Categoryid string
+	Name       string
+	Icon       string
+	UserID     string
+	CreatedAt  string
+	UpdatedAt  string
+	DeletedAt  string
 }{
-	Name:      "name",
-	Icon:      "icon",
-	UserID:    "user_id",
-	CreatedAt: "created_at",
-	UpdatedAt: "updated_at",
-	DeletedAt: "deleted_at",
+	Categoryid: "categoryid",
+	Name:       "name",
+	Icon:       "icon",
+	UserID:     "user_id",
+	CreatedAt:  "created_at",
+	UpdatedAt:  "updated_at",
+	DeletedAt:  "deleted_at",
 }
 
 // Generated where
@@ -100,27 +103,33 @@ func (w whereHelpernull_Time) GTE(x null.Time) qm.QueryMod {
 }
 
 var CategoryWhere = struct {
-	Name      whereHelperstring
-	Icon      whereHelperstring
-	UserID    whereHelperstring
-	CreatedAt whereHelpernull_Time
-	UpdatedAt whereHelpernull_Time
-	DeletedAt whereHelpernull_Time
+	Categoryid whereHelperstring
+	Name       whereHelperstring
+	Icon       whereHelperstring
+	UserID     whereHelperstring
+	CreatedAt  whereHelpernull_Time
+	UpdatedAt  whereHelpernull_Time
+	DeletedAt  whereHelpernull_Time
 }{
-	Name:      whereHelperstring{field: "\"category\".\"name\""},
-	Icon:      whereHelperstring{field: "\"category\".\"icon\""},
-	UserID:    whereHelperstring{field: "\"category\".\"user_id\""},
-	CreatedAt: whereHelpernull_Time{field: "\"category\".\"created_at\""},
-	UpdatedAt: whereHelpernull_Time{field: "\"category\".\"updated_at\""},
-	DeletedAt: whereHelpernull_Time{field: "\"category\".\"deleted_at\""},
+	Categoryid: whereHelperstring{field: "\"category\".\"categoryid\""},
+	Name:       whereHelperstring{field: "\"category\".\"name\""},
+	Icon:       whereHelperstring{field: "\"category\".\"icon\""},
+	UserID:     whereHelperstring{field: "\"category\".\"user_id\""},
+	CreatedAt:  whereHelpernull_Time{field: "\"category\".\"created_at\""},
+	UpdatedAt:  whereHelpernull_Time{field: "\"category\".\"updated_at\""},
+	DeletedAt:  whereHelpernull_Time{field: "\"category\".\"deleted_at\""},
 }
 
 // CategoryRels is where relationship names are stored.
 var CategoryRels = struct {
-}{}
+	CategoryidExpenses string
+}{
+	CategoryidExpenses: "CategoryidExpenses",
+}
 
 // categoryR is where relationships are stored.
 type categoryR struct {
+	CategoryidExpenses ExpenseSlice `boil:"CategoryidExpenses" json:"CategoryidExpenses" toml:"CategoryidExpenses" yaml:"CategoryidExpenses"`
 }
 
 // NewStruct creates a new relationship struct
@@ -132,10 +141,10 @@ func (*categoryR) NewStruct() *categoryR {
 type categoryL struct{}
 
 var (
-	categoryAllColumns            = []string{"name", "icon", "user_id", "created_at", "updated_at", "deleted_at"}
-	categoryColumnsWithoutDefault = []string{"name", "icon", "user_id", "created_at", "updated_at", "deleted_at"}
+	categoryAllColumns            = []string{"categoryid", "name", "icon", "user_id", "created_at", "updated_at", "deleted_at"}
+	categoryColumnsWithoutDefault = []string{"categoryid", "name", "icon", "user_id", "created_at", "updated_at", "deleted_at"}
 	categoryColumnsWithDefault    = []string{}
-	categoryPrimaryKeyColumns     = []string{"name"}
+	categoryPrimaryKeyColumns     = []string{"categoryid"}
 )
 
 type (
@@ -413,6 +422,250 @@ func (q categoryQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (b
 	return count > 0, nil
 }
 
+// CategoryidExpenses retrieves all the expense's Expenses with an executor via categoryid column.
+func (o *Category) CategoryidExpenses(mods ...qm.QueryMod) expenseQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"expenses\".\"categoryid\"=?", o.Categoryid),
+		qmhelper.WhereIsNull("\"expenses\".\"deleted_at\""),
+	)
+
+	query := Expenses(queryMods...)
+	queries.SetFrom(query.Query, "\"expenses\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"expenses\".*"})
+	}
+
+	return query
+}
+
+// LoadCategoryidExpenses allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (categoryL) LoadCategoryidExpenses(ctx context.Context, e boil.ContextExecutor, singular bool, maybeCategory interface{}, mods queries.Applicator) error {
+	var slice []*Category
+	var object *Category
+
+	if singular {
+		object = maybeCategory.(*Category)
+	} else {
+		slice = *maybeCategory.(*[]*Category)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &categoryR{}
+		}
+		args = append(args, object.Categoryid)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &categoryR{}
+			}
+
+			for _, a := range args {
+				if queries.Equal(a, obj.Categoryid) {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.Categoryid)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.From(`expenses`),
+		qm.WhereIn(`expenses.categoryid in ?`, args...),
+		qmhelper.WhereIsNull(`expenses.deleted_at`),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load expenses")
+	}
+
+	var resultSlice []*Expense
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice expenses")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on expenses")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for expenses")
+	}
+
+	if len(expenseAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.CategoryidExpenses = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &expenseR{}
+			}
+			foreign.R.CategoryidCategory = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if queries.Equal(local.Categoryid, foreign.Categoryid) {
+				local.R.CategoryidExpenses = append(local.R.CategoryidExpenses, foreign)
+				if foreign.R == nil {
+					foreign.R = &expenseR{}
+				}
+				foreign.R.CategoryidCategory = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// AddCategoryidExpenses adds the given related objects to the existing relationships
+// of the category, optionally inserting them as new records.
+// Appends related to o.R.CategoryidExpenses.
+// Sets related.R.CategoryidCategory appropriately.
+func (o *Category) AddCategoryidExpenses(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Expense) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			queries.Assign(&rel.Categoryid, o.Categoryid)
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"expenses\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"categoryid"}),
+				strmangle.WhereClause("\"", "\"", 2, expensePrimaryKeyColumns),
+			)
+			values := []interface{}{o.Categoryid, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			queries.Assign(&rel.Categoryid, o.Categoryid)
+		}
+	}
+
+	if o.R == nil {
+		o.R = &categoryR{
+			CategoryidExpenses: related,
+		}
+	} else {
+		o.R.CategoryidExpenses = append(o.R.CategoryidExpenses, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &expenseR{
+				CategoryidCategory: o,
+			}
+		} else {
+			rel.R.CategoryidCategory = o
+		}
+	}
+	return nil
+}
+
+// SetCategoryidExpenses removes all previously related items of the
+// category replacing them completely with the passed
+// in related items, optionally inserting them as new records.
+// Sets o.R.CategoryidCategory's CategoryidExpenses accordingly.
+// Replaces o.R.CategoryidExpenses with related.
+// Sets related.R.CategoryidCategory's CategoryidExpenses accordingly.
+func (o *Category) SetCategoryidExpenses(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*Expense) error {
+	query := "update \"expenses\" set \"categoryid\" = null where \"categoryid\" = $1"
+	values := []interface{}{o.Categoryid}
+	if boil.IsDebug(ctx) {
+		writer := boil.DebugWriterFrom(ctx)
+		fmt.Fprintln(writer, query)
+		fmt.Fprintln(writer, values)
+	}
+	_, err := exec.ExecContext(ctx, query, values...)
+	if err != nil {
+		return errors.Wrap(err, "failed to remove relationships before set")
+	}
+
+	if o.R != nil {
+		for _, rel := range o.R.CategoryidExpenses {
+			queries.SetScanner(&rel.Categoryid, nil)
+			if rel.R == nil {
+				continue
+			}
+
+			rel.R.CategoryidCategory = nil
+		}
+
+		o.R.CategoryidExpenses = nil
+	}
+	return o.AddCategoryidExpenses(ctx, exec, insert, related...)
+}
+
+// RemoveCategoryidExpenses relationships from objects passed in.
+// Removes related items from R.CategoryidExpenses (uses pointer comparison, removal does not keep order)
+// Sets related.R.CategoryidCategory.
+func (o *Category) RemoveCategoryidExpenses(ctx context.Context, exec boil.ContextExecutor, related ...*Expense) error {
+	var err error
+	for _, rel := range related {
+		queries.SetScanner(&rel.Categoryid, nil)
+		if rel.R != nil {
+			rel.R.CategoryidCategory = nil
+		}
+		if _, err = rel.Update(ctx, exec, boil.Whitelist("categoryid")); err != nil {
+			return err
+		}
+	}
+	if o.R == nil {
+		return nil
+	}
+
+	for _, rel := range related {
+		for i, ri := range o.R.CategoryidExpenses {
+			if rel != ri {
+				continue
+			}
+
+			ln := len(o.R.CategoryidExpenses)
+			if ln > 1 && i < ln-1 {
+				o.R.CategoryidExpenses[i] = o.R.CategoryidExpenses[ln-1]
+			}
+			o.R.CategoryidExpenses = o.R.CategoryidExpenses[:ln-1]
+			break
+		}
+	}
+
+	return nil
+}
+
 // Categories retrieves all the records using an executor.
 func Categories(mods ...qm.QueryMod) categoryQuery {
 	mods = append(mods, qm.From("\"category\""), qmhelper.WhereIsNull("\"category\".\"deleted_at\""))
@@ -421,7 +674,7 @@ func Categories(mods ...qm.QueryMod) categoryQuery {
 
 // FindCategory retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindCategory(ctx context.Context, exec boil.ContextExecutor, name string, selectCols ...string) (*Category, error) {
+func FindCategory(ctx context.Context, exec boil.ContextExecutor, categoryid string, selectCols ...string) (*Category, error) {
 	categoryObj := &Category{}
 
 	sel := "*"
@@ -429,10 +682,10 @@ func FindCategory(ctx context.Context, exec boil.ContextExecutor, name string, s
 		sel = strings.Join(strmangle.IdentQuoteSlice(dialect.LQ, dialect.RQ, selectCols), ",")
 	}
 	query := fmt.Sprintf(
-		"select %s from \"category\" where \"name\"=$1 and \"deleted_at\" is null", sel,
+		"select %s from \"category\" where \"categoryid\"=$1 and \"deleted_at\" is null", sel,
 	)
 
-	q := queries.Raw(query, name)
+	q := queries.Raw(query, categoryid)
 
 	err := q.Bind(ctx, exec, categoryObj)
 	if err != nil {
@@ -808,12 +1061,12 @@ func (o *Category) Delete(ctx context.Context, exec boil.ContextExecutor, hardDe
 	)
 	if hardDelete {
 		args = queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), categoryPrimaryKeyMapping)
-		sql = "DELETE FROM \"category\" WHERE \"name\"=$1"
+		sql = "DELETE FROM \"category\" WHERE \"categoryid\"=$1"
 	} else {
 		currTime := time.Now().In(boil.GetLocation())
 		o.DeletedAt = null.TimeFrom(currTime)
 		wl := []string{"deleted_at"}
-		sql = fmt.Sprintf("UPDATE \"category\" SET %s WHERE \"name\"=$2",
+		sql = fmt.Sprintf("UPDATE \"category\" SET %s WHERE \"categoryid\"=$2",
 			strmangle.SetParamNames("\"", "\"", 1, wl),
 		)
 		valueMapping, err := queries.BindMapping(categoryType, categoryMapping, append(wl, categoryPrimaryKeyColumns...))
@@ -940,7 +1193,7 @@ func (o CategorySlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor,
 // Reload refetches the object from the database
 // using the primary keys with an executor.
 func (o *Category) Reload(ctx context.Context, exec boil.ContextExecutor) error {
-	ret, err := FindCategory(ctx, exec, o.Name)
+	ret, err := FindCategory(ctx, exec, o.Categoryid)
 	if err != nil {
 		return err
 	}
@@ -980,16 +1233,16 @@ func (o *CategorySlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor
 }
 
 // CategoryExists checks if the Category row exists.
-func CategoryExists(ctx context.Context, exec boil.ContextExecutor, name string) (bool, error) {
+func CategoryExists(ctx context.Context, exec boil.ContextExecutor, categoryid string) (bool, error) {
 	var exists bool
-	sql := "select exists(select 1 from \"category\" where \"name\"=$1 and \"deleted_at\" is null limit 1)"
+	sql := "select exists(select 1 from \"category\" where \"categoryid\"=$1 and \"deleted_at\" is null limit 1)"
 
 	if boil.IsDebug(ctx) {
 		writer := boil.DebugWriterFrom(ctx)
 		fmt.Fprintln(writer, sql)
-		fmt.Fprintln(writer, name)
+		fmt.Fprintln(writer, categoryid)
 	}
-	row := exec.QueryRowContext(ctx, sql, name)
+	row := exec.QueryRowContext(ctx, sql, categoryid)
 
 	err := row.Scan(&exists)
 	if err != nil {

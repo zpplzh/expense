@@ -595,6 +595,166 @@ func testExpensesInsertWhitelist(t *testing.T) {
 	}
 }
 
+func testExpenseToOneCategoryUsingCategoryidCategory(t *testing.T) {
+	ctx := context.Background()
+	tx := MustTx(boil.BeginTx(ctx, nil))
+	defer func() { _ = tx.Rollback() }()
+
+	var local Expense
+	var foreign Category
+
+	seed := randomize.NewSeed()
+	if err := randomize.Struct(seed, &local, expenseDBTypes, true, expenseColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Expense struct: %s", err)
+	}
+	if err := randomize.Struct(seed, &foreign, categoryDBTypes, false, categoryColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Category struct: %s", err)
+	}
+
+	if err := foreign.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	queries.Assign(&local.Categoryid, foreign.Categoryid)
+	if err := local.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	check, err := local.CategoryidCategory().One(ctx, tx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !queries.Equal(check.Categoryid, foreign.Categoryid) {
+		t.Errorf("want: %v, got %v", foreign.Categoryid, check.Categoryid)
+	}
+
+	slice := ExpenseSlice{&local}
+	if err = local.L.LoadCategoryidCategory(ctx, tx, false, (*[]*Expense)(&slice), nil); err != nil {
+		t.Fatal(err)
+	}
+	if local.R.CategoryidCategory == nil {
+		t.Error("struct should have been eager loaded")
+	}
+
+	local.R.CategoryidCategory = nil
+	if err = local.L.LoadCategoryidCategory(ctx, tx, true, &local, nil); err != nil {
+		t.Fatal(err)
+	}
+	if local.R.CategoryidCategory == nil {
+		t.Error("struct should have been eager loaded")
+	}
+}
+
+func testExpenseToOneSetOpCategoryUsingCategoryidCategory(t *testing.T) {
+	var err error
+
+	ctx := context.Background()
+	tx := MustTx(boil.BeginTx(ctx, nil))
+	defer func() { _ = tx.Rollback() }()
+
+	var a Expense
+	var b, c Category
+
+	seed := randomize.NewSeed()
+	if err = randomize.Struct(seed, &a, expenseDBTypes, false, strmangle.SetComplement(expensePrimaryKeyColumns, expenseColumnsWithoutDefault)...); err != nil {
+		t.Fatal(err)
+	}
+	if err = randomize.Struct(seed, &b, categoryDBTypes, false, strmangle.SetComplement(categoryPrimaryKeyColumns, categoryColumnsWithoutDefault)...); err != nil {
+		t.Fatal(err)
+	}
+	if err = randomize.Struct(seed, &c, categoryDBTypes, false, strmangle.SetComplement(categoryPrimaryKeyColumns, categoryColumnsWithoutDefault)...); err != nil {
+		t.Fatal(err)
+	}
+
+	if err := a.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+	if err = b.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	for i, x := range []*Category{&b, &c} {
+		err = a.SetCategoryidCategory(ctx, tx, i != 0, x)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if a.R.CategoryidCategory != x {
+			t.Error("relationship struct not set to correct value")
+		}
+
+		if x.R.CategoryidExpenses[0] != &a {
+			t.Error("failed to append to foreign relationship struct")
+		}
+		if !queries.Equal(a.Categoryid, x.Categoryid) {
+			t.Error("foreign key was wrong value", a.Categoryid)
+		}
+
+		zero := reflect.Zero(reflect.TypeOf(a.Categoryid))
+		reflect.Indirect(reflect.ValueOf(&a.Categoryid)).Set(zero)
+
+		if err = a.Reload(ctx, tx); err != nil {
+			t.Fatal("failed to reload", err)
+		}
+
+		if !queries.Equal(a.Categoryid, x.Categoryid) {
+			t.Error("foreign key was wrong value", a.Categoryid, x.Categoryid)
+		}
+	}
+}
+
+func testExpenseToOneRemoveOpCategoryUsingCategoryidCategory(t *testing.T) {
+	var err error
+
+	ctx := context.Background()
+	tx := MustTx(boil.BeginTx(ctx, nil))
+	defer func() { _ = tx.Rollback() }()
+
+	var a Expense
+	var b Category
+
+	seed := randomize.NewSeed()
+	if err = randomize.Struct(seed, &a, expenseDBTypes, false, strmangle.SetComplement(expensePrimaryKeyColumns, expenseColumnsWithoutDefault)...); err != nil {
+		t.Fatal(err)
+	}
+	if err = randomize.Struct(seed, &b, categoryDBTypes, false, strmangle.SetComplement(categoryPrimaryKeyColumns, categoryColumnsWithoutDefault)...); err != nil {
+		t.Fatal(err)
+	}
+
+	if err = a.Insert(ctx, tx, boil.Infer()); err != nil {
+		t.Fatal(err)
+	}
+
+	if err = a.SetCategoryidCategory(ctx, tx, true, &b); err != nil {
+		t.Fatal(err)
+	}
+
+	if err = a.RemoveCategoryidCategory(ctx, tx, &b); err != nil {
+		t.Error("failed to remove relationship")
+	}
+
+	count, err := a.CategoryidCategory().Count(ctx, tx)
+	if err != nil {
+		t.Error(err)
+	}
+	if count != 0 {
+		t.Error("want no relationships remaining")
+	}
+
+	if a.R.CategoryidCategory != nil {
+		t.Error("R struct entry should be nil")
+	}
+
+	if !queries.IsValuerNil(a.Categoryid) {
+		t.Error("foreign key value should be nil")
+	}
+
+	if len(b.R.CategoryidExpenses) != 0 {
+		t.Error("failed to remove a from b's relationships")
+	}
+}
+
 func testExpensesReload(t *testing.T) {
 	t.Parallel()
 
@@ -669,7 +829,7 @@ func testExpensesSelect(t *testing.T) {
 }
 
 var (
-	expenseDBTypes = map[string]string{`ID`: `text`, `Name`: `text`, `Icon`: `text`, `Amount`: `integer`, `Note`: `text`, `ExpenseDate`: `date`, `UserID`: `text`, `Sequence`: `integer`, `CreatedAt`: `timestamp with time zone`, `UpdatedAt`: `timestamp with time zone`, `DeletedAt`: `timestamp with time zone`}
+	expenseDBTypes = map[string]string{`ID`: `text`, `Categoryid`: `text`, `Amount`: `integer`, `Note`: `text`, `ExpenseDate`: `date`, `UserID`: `text`, `CreatedAt`: `timestamp with time zone`, `UpdatedAt`: `timestamp with time zone`, `DeletedAt`: `timestamp with time zone`}
 	_              = bytes.MinRead
 )
 

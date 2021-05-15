@@ -7,10 +7,12 @@ var TableNames = struct {
 	Category         string
 	Expenses         string
 	SchemaMigrations string
+	Session          string
 	Users            string
 }{
 	Category:         "category",
 	Expenses:         "expenses",
 	SchemaMigrations: "schema_migrations",
+	Session:          "session",
 	Users:            "users",
 }
