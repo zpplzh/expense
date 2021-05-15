@@ -42,22 +42,30 @@ Expense Tracker REST API with several functionality such as:
 ## User
 | API  | Description |
 | ------------- | ------------- |
-| /signup  | to register  |
+| POST /signup  | to register  |
+| POST /login  | to login  |
+| POST /logout  | to logout  |
+
+
 
 ## Category
 | API  | Description |
 | ------------- | ------------- |
-| /addcategory  | to add category with icon  |
-| /getcategory/{category} | to view category created before  |
-| /deletecategory/{category} | to delete category created before  |
-| /listcategory | to view all category created before  |
+| POST /categories  | to add category with icon  |
+| GET /categories/{id} | to view category created before  |
+| DELETE /categories/{id} | to delete category created before  |
+| GET /categories | to view all category created before  |
+| POST /categories/{id} | to update category created before  |
 
 ## Expense
 | API  | Description |
 | ------------- | ------------- |
-| /addexpense  | to add expense |
-| /getexpense/{expense} | to view expense created before  |
-| /listexpenses | to view all expenses created before  |
+| POST /expenses | to add expense |
+| GET /expenses/{id} | to view expense created before  |
+| GET /expenses | to view all expenses created before  |
+| DELETE /expenses/{id} | to delete expenses created before  |
+| UPDATE /expenses/{id} | to update expenses created before  |
+| POST /batch/expenses | to add expense in batch |
 
 
 
