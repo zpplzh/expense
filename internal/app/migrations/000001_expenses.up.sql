@@ -6,7 +6,6 @@ CREATE TABLE "expenses" (
     note text,
     expense_date date NOT NULL,
     user_id text NOT NULL,
-
     created_at timestamp with time zone,
     updated_at timestamp with time zone,
     deleted_at timestamp with time zone,
