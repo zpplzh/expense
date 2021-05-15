@@ -59,8 +59,11 @@ type (
 		Id string `json: "id"`
 	}
 
-	BatchAddExpenseInput struct {
-		data []*AddExpenseInput
+	AddExpenseBatchInput struct {
+		Data []*AddExpenseInput `json:"data"`
+	}
+
+	AddExpenseBatchOutput struct {
 	}
 )
 
@@ -170,4 +173,48 @@ func (r *servicedb) UpdateExpense(ctx context.Context, input *UpdateExpenseInput
 		Id: input.Id,
 	}, nil
 
+}
+
+func (r *servicedb) AddExpenseBatch(ctx context.Context, input *AddExpenseBatchInput) (*AddExpenseBatchOutput, error) {
+	tx, err := r.db.BeginTx(ctx, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	uid := ctx.Value("uid")
+
+	for _, val := range input.Data {
+		id := ksuid.New()
+		inputex := &model.Expense{
+			ID:          id.String(),
+			UserID:      uid.(string),
+			Amount:      val.Amount,
+			Note:        null.StringFrom(val.Note),
+			ExpenseDate: val.ExpenseDate,
+		}
+
+		if val.CategoryId != nil {
+			cat, err := model.Categories(qm.Where("categoryid=? and user_id=?", val.CategoryId, uid.(string))).One(ctx, r.db)
+			if err != nil {
+				return nil, ErrNotFound
+			}
+			if uid == cat.UserID {
+				inputex.Categoryid = null.StringFrom(cat.Categoryid)
+			}
+		}
+
+		err := inputex.Insert(ctx, tx, boil.Infer())
+		if err != nil {
+			//tx.Rollback()
+			return nil, ErrDuplicate
+		}
+
+	}
+
+	err1 := tx.Commit()
+	if err1 != nil {
+		return nil, ErrNotFound
+	}
+
+	return &AddExpenseBatchOutput{}, nil
 }

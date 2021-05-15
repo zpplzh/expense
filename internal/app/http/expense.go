@@ -113,3 +113,25 @@ func UpdateExpense(upex app.Service) http.Handler {
 		httptransport.ServerErrorEncoder(encodeError),
 	)
 }
+
+func AddExpenseBatch(addex app.Service) http.Handler {
+	// Endpoint.
+	return httptransport.NewServer(
+		//endpoint
+		endpoint.AddExpenseBatch(addex),
+
+		// Decoder.
+		func(_ context.Context, r *http.Request) (interface{}, error) {
+			var input app.AddExpenseBatchInput
+			if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+
+			}
+
+			return &input, nil
+		},
+
+		// Encoder.
+		encodeResponse,
+		httptransport.ServerErrorEncoder(encodeError),
+	)
+}

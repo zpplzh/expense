@@ -57,3 +57,12 @@ func UpdateExpense(upex app.Service) endpoint.Endpoint {
 		return upc, nil
 	}
 }
+
+func AddExpenseBatch(addex app.Service) endpoint.Endpoint {
+	return func(ctx context.Context, request interface{}) (interface{}, error) {
+		input := request.(*app.AddExpenseBatchInput)
+		add, err := addex.AddExpenseBatch(ctx, input)
+
+		return add, err
+	}
+}

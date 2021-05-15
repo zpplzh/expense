@@ -53,9 +53,11 @@ func main() {
 		c.Get("/expenses/{id}", httptransport.GetExpense(svc).ServeHTTP)
 		c.Delete("/expenses/{id}", httptransport.DelExpense(svc).ServeHTTP)
 		c.Post("/expenses/{id}", httptransport.UpdateExpense(svc).ServeHTTP)
+		c.Post("/batch/expenses", httptransport.AddExpenseBatch(svc).ServeHTTP)
 
 		//user
 		c.Post("/logout", httptransport.Logout(svc).ServeHTTP)
+
 	})
 
 	//user
